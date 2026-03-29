@@ -1,0 +1,992 @@
+<style>
+    /* 页面头部 */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e8e8e8;
+}
+
+.page-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0;
+}
+
+.btn-add {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-add:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+/* 筛选区域 */
+.filter-section {
+    background: #f0f7ff;
+    padding: 16px 20px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    border: 1px solid #d6e8ff;
+}
+
+.filter-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.filter-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filter-item label {
+    font-weight: 500;
+    color: #4a6fa5;
+    white-space: nowrap;
+    font-size: 14px;
+}
+
+.filter-item .form-select,
+.filter-item .form-control {
+    min-width: 140px;
+    padding: 6px 12px;
+    border: 1px solid #b8d4f0;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.filter-item .form-select:focus,
+.filter-item .form-control:focus {
+    border-color: #4a90e2;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.15);
+}
+
+.filter-item .form-control:focus,
+.filter-item .form-select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.filter-actions {
+    flex-direction: row;
+    gap: 12px;
+    margin-left: auto;
+}
+
+.btn-search,
+.btn-reset {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-search {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-search:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-reset {
+    background: #f0f0f0;
+    color: #666;
+}
+
+.btn-reset:hover {
+    background: #e0e0e0;
+}
+
+/* 表格容器 */
+.table-container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th {
+    background: #f8f9fa;
+    padding: 16px;
+    text-align: left;
+    font-weight: 600;
+    color: #1a1a1a;
+    border-bottom: 2px solid #e8e8e8;
+    white-space: nowrap;
+}
+
+.data-table td {
+    padding: 16px;
+    border-bottom: 1px solid #f0f0f0;
+    color: #333;
+}
+
+.data-table tbody tr:hover {
+    background: #f8f9fa;
+}
+
+/* 会员等级徽章 */
+.level-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.level-badge.普通 {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.level-badge.银卡 {
+    background: #f3e5f5;
+    color: #7b1fa2;
+}
+
+.level-badge.金卡 {
+    background: #fff3e0;
+    color: #f57c00;
+}
+
+.level-badge.钻石 {
+    background: #e8f5e9;
+    color: #388e3c;
+}
+
+/* 操作按钮 */
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-right: 4px;
+}
+
+.action-btn.edit {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.action-btn.edit:hover {
+    background: #bbdefb;
+}
+
+.action-btn.recharge {
+    background: #e8f5e9;
+    color: #388e3c;
+}
+
+.action-btn.recharge:hover {
+    background: #c8e6c9;
+}
+
+.action-btn.points {
+    background: #fff3e0;
+    color: #f57c00;
+}
+
+.action-btn.points:hover {
+    background: #ffe0b2;
+}
+
+.action-btn.delete {
+    background: #ffebee;
+    color: #d32f2f;
+}
+
+.action-btn.delete:hover {
+    background: #ffcdd2;
+}
+
+/* 分页 */
+.pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.pagination-info {
+    font-size: 14px;
+    color: #666;
+}
+
+.pagination {
+    display: flex;
+    gap: 8px;
+}
+
+.page-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #666;
+    text-decoration: none;
+    background: #f8f9fa;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: none;
+}
+
+.page-link:hover {
+    background: #e8e8e8;
+}
+
+.page-link.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.page-link.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* 空状态 */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    color: #999;
+}
+
+.empty-state i {
+    font-size: 48px;
+    margin-bottom: 16px;
+}
+
+.empty-state p {
+    font-size: 16px;
+    margin: 0;
+}
+
+/* 模态框 */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.modal-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #999;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.modal-close:hover {
+    background: #f0f0f0;
+    color: #333;
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 20px;
+    border-top: 1px solid #f0f0f0;
+}
+
+/* 表单样式 */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.form-label .required {
+    color: #f44336;
+}
+
+.form-control,
+.form-select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.form-control:focus,
+.form-select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.btn {
+    padding: 10px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-secondary {
+    background: #f0f0f0;
+    color: #666;
+}
+
+.btn-secondary:hover {
+    background: #e0e0e0;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+</style>
+
+<!-- 页面头部 -->
+<div class="page-header">
+    <h1 class="page-title">会员管理</h1>
+    <button class="btn-add" onclick="openAddModal()">
+        <i class="bi bi-plus-circle"></i>
+        新增会员
+    </button>
+</div>
+
+<!-- 筛选区域 -->
+<div class="filter-section">
+    <div class="filter-row">
+        <div class="filter-item">
+            <label>手机号：</label>
+            <input type="text" id="phoneFilter" class="form-control" placeholder="输入手机号" value="{{ phone_search }}">
+        </div>
+        <div class="filter-item">
+            <label>会员名称：</label>
+            <input type="text" id="nameFilter" class="form-control" placeholder="输入会员名称" value="{{ name_search }}">
+        </div>
+        <div class="filter-item">
+            <label>会员等级：</label>
+            <select id="levelFilter" class="form-select">
+                <option value="">全部等级</option>
+                {% for level_value, level_display in member_levels %}
+                <option value="{{ level_value }}" {% if level_filter == level_value %}selected{% endif %}>{{ level_display }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="filter-item">
+            <label>卡号：</label>
+            <input type="text" id="cardNoFilter" class="form-control" placeholder="输入卡号" value="{{ card_no_search }}">
+        </div>
+        <div class="filter-item filter-actions">
+            <button class="btn-search" id="searchBtn">
+                <i class="bi bi-search"></i>
+                搜索
+            </button>
+            <button class="btn-reset" id="resetBtn">
+                <i class="bi bi-arrow-counterclockwise"></i>
+                重置
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- 会员列表 -->
+<div class="table-container">
+    {% if members %}
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>卡号</th>
+                <th>姓名</th>
+                <th>手机号</th>
+                <th>会员等级</th>
+                <th>积分</th>
+                <th>储值余额</th>
+                <th>注册时间</th>
+                <th>最后消费时间</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for member in members %}
+            <tr data-id="{{ member.id }}" data-name="{{ member.name }}" data-phone="{{ member.phone }}" data-level="{{ member.level }}">
+                <td>{{ member.card_no }}</td>
+                <td>{{ member.name }}</td>
+                <td>{{ member.phone|default:'-' }}</td>
+                <td>
+                    <span class="level-badge {{ member.level }}">{{ member.level }}</span>
+                </td>
+                <td>{{ member.points }}</td>
+                <td>¥{{ member.balance }}</td>
+                <td>{{ member.create_time|date:"Y-m-d H:i" }}</td>
+                <td>{{ member.last_visit_time|date:"Y-m-d H:i"|default:'-' }}</td>
+                <td>
+                    <button class="action-btn edit" onclick="openEditModal(this)">
+                        <i class="bi bi-pencil"></i> 编辑
+                    </button>
+                    <button class="action-btn recharge" onclick="openRechargeModal({{ member.id }}, '{{ member.name }}')">
+                        <i class="bi bi-wallet2"></i> 充值
+                    </button>
+                    <button class="action-btn points" onclick="openPointsModal({{ member.id }}, '{{ member.name }}', {{ member.points }})">
+                        <i class="bi bi-coin"></i> 积分
+                    </button>
+                    <button class="action-btn delete" onclick="deleteMember({{ member.id }}, '{{ member.name }}')">
+                        <i class="bi bi-trash"></i> 删除
+                    </button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <!-- 分页 -->
+    {% if members.paginator.num_pages > 1 %}
+    <div class="pagination-container">
+        <div class="pagination-info">
+            共 {{ members.paginator.count }} 条记录，第 {{ members.number }} / {{ members.paginator.num_pages }} 页
+        </div>
+        <div class="pagination">
+            {% if members.has_previous %}
+            <a href="javascript:void(0)" class="page-link" onclick="goToPage({{ members.previous_page_number }})">
+                <i class="bi bi-chevron-left"></i>
+            </a>
+            {% else %}
+            <span class="page-link disabled"><i class="bi bi-chevron-left"></i></span>
+            {% endif %}
+            
+            {% for num in members.paginator.page_range %}
+                {% if num == members.number %}
+                <span class="page-link active">{{ num }}</span>
+                {% elif num > members.number|add:'-3' and num < members.number|add:'3' %}
+                <a href="javascript:void(0)" class="page-link" onclick="goToPage({{ num }})">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+            
+            {% if members.has_next %}
+            <a href="javascript:void(0)" class="page-link" onclick="goToPage({{ members.next_page_number }})">
+                <i class="bi bi-chevron-right"></i>
+            </a>
+            {% else %}
+            <span class="page-link disabled"><i class="bi bi-chevron-right"></i></span>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+    {% else %}
+    <div class="empty-state">
+        <i class="bi bi-people"></i>
+        <p>暂无会员数据</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- 新增/编辑会员模态框 -->
+<div class="modal" id="memberModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title" id="modalTitle">新增会员</h3>
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="memberForm">
+                {% csrf_token %}
+                <input type="hidden" id="memberId" name="member_id">
+                <input type="hidden" id="action" name="action" value="add">
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        会员姓名 <span class="required">*</span>
+                    </label>
+                    <input type="text" class="form-control" id="memberName" name="name" placeholder="请输入会员姓名" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">手机号</label>
+                    <input type="text" class="form-control" id="memberPhone" name="phone" placeholder="请输入手机号" maxlength="11">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        会员等级 <span class="required">*</span>
+                    </label>
+                    <select class="form-select" id="memberLevel" name="level">
+                        {% for level_value, level_display in member_levels %}
+                        <option value="{{ level_value }}">{{ level_display }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeModal()">取消</button>
+            <button type="button" class="btn btn-primary" onclick="saveMember()">保存</button>
+        </div>
+    </div>
+</div>
+
+<!-- 充值模态框 -->
+<div class="modal" id="rechargeModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">会员充值</h3>
+            <button class="modal-close" onclick="closeRechargeModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="rechargeForm">
+                {% csrf_token %}
+                <input type="hidden" id="rechargeMemberId" name="member_id">
+                
+                <div class="form-group">
+                    <label class="form-label">会员姓名</label>
+                    <input type="text" class="form-control" id="rechargeMemberName" readonly>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        充值金额 <span class="required">*</span>
+                    </label>
+                    <input type="number" class="form-control" id="rechargeAmount" name="amount" placeholder="请输入充值金额" min="0.01" step="0.01" required>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeRechargeModal()">取消</button>
+            <button type="button" class="btn btn-primary" onclick="saveRecharge()">确认充值</button>
+        </div>
+    </div>
+</div>
+
+<!-- 积分调整模态框 -->
+<div class="modal" id="pointsModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">积分调整</h3>
+            <button class="modal-close" onclick="closePointsModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="pointsForm">
+                {% csrf_token %}
+                <input type="hidden" id="pointsMemberId" name="member_id">
+                <input type="hidden" id="pointsAdjustType" name="adjust_type" value="add">
+                
+                <div class="form-group">
+                    <label class="form-label">会员姓名</label>
+                    <input type="text" class="form-control" id="pointsMemberName" readonly>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">当前积分</label>
+                    <input type="text" class="form-control" id="currentPoints" readonly>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        调整类型 <span class="required">*</span>
+                    </label>
+                    <select class="form-select" id="pointsAdjustTypeSelect" onchange="$('#pointsAdjustType').val(this.value)">
+                        <option value="add">增加积分</option>
+                        <option value="subtract">扣除积分</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        积分数量 <span class="required">*</span>
+                    </label>
+                    <input type="number" class="form-control" id="pointsAmount" name="points" placeholder="请输入积分数量" min="1" step="1" required>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closePointsModal()">取消</button>
+            <button type="button" class="btn btn-primary" onclick="savePoints()">确认调整</button>
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    
+
+
+    var $phoneFilter = $('#phoneFilter');
+    var $nameFilter = $('#nameFilter');
+    var $levelFilter = $('#levelFilter');
+    var $cardNoFilter = $('#cardNoFilter');
+    var $searchBtn = $('#searchBtn');
+    var $resetBtn = $('#resetBtn');
+    
+    // 搜索按钮点击
+    $searchBtn.on('click', function() {
+        searchMembers();
+    });
+    
+    // 重置按钮点击
+    $resetBtn.on('click', function() {
+        $phoneFilter.val('');
+        $nameFilter.val('');
+        $levelFilter.val('');
+        $cardNoFilter.val('');
+        loadPage('{% url "members:member_list" %}');
+    });
+    
+    // 回车键搜索
+    $phoneFilter, $nameFilter, $cardNoFilter.on('keypress', function(e) {
+        if (e.which === 13) {
+            searchMembers();
+        }
+    });
+    
+    $levelFilter.on('change', function() {
+        searchMembers();
+    });
+    
+    function searchMembers() {
+        var phone = $phoneFilter.val().trim();
+        var name = $nameFilter.val().trim();
+        var level = $levelFilter.val();
+        var cardNo = $cardNoFilter.val().trim();
+        
+        var params = [];
+        if (phone) params.push('phone=' + encodeURIComponent(phone));
+        if (name) params.push('name=' + encodeURIComponent(name));
+        if (level) params.push('level=' + encodeURIComponent(level));
+        if (cardNo) params.push('card_no=' + encodeURIComponent(cardNo));
+        params.push('page=1');
+        
+        loadPage('{% url "members:member_list" %}?' + params.join('&'));
+    }
+});
+
+// 分页跳转
+function goToPage(pageNum) {
+    var phone = $('#phoneFilter').val().trim();
+    var name = $('#nameFilter').val().trim();
+    var level = $('#levelFilter').val();
+    var cardNo = $('#cardNoFilter').val().trim();
+    
+    var params = ['page=' + pageNum];
+    if (phone) params.push('phone=' + encodeURIComponent(phone));
+    if (name) params.push('name=' + encodeURIComponent(name));
+    if (level) params.push('level=' + encodeURIComponent(level));
+    if (cardNo) params.push('card_no=' + encodeURIComponent(cardNo));
+    
+    loadPage('{% url "members:member_list" %}?' + params.join('&'));
+}
+
+// 打开新增模态框
+function openAddModal() {
+    $('#modalTitle').text('新增会员');
+    $('#action').val('add');
+    $('#memberId').val('');
+    $('#memberForm')[0].reset();
+    $('#memberModal').addClass('show');
+}
+
+// 打开编辑模态框
+function openEditModal(btn) {
+    var $row = $(btn).closest('tr');
+    var memberId = $row.data('id');
+    var name = $row.data('name');
+    var phone = $row.data('phone');
+    var level = $row.data('level');
+    
+    $('#modalTitle').text('编辑会员');
+    $('#action').val('edit');
+    $('#memberId').val(memberId);
+    $('#memberName').val(name);
+    $('#memberPhone').val(phone);
+    $('#memberLevel').val(level);
+    $('#memberModal').addClass('show');
+}
+
+// 关闭模态框
+function closeModal() {
+    $('#memberModal').removeClass('show');
+}
+
+// 保存会员
+function saveMember() {
+    var action = $('#action').val();
+    var memberId = $('#memberId').val();
+    var name = $('#memberName').val().trim();
+    var phone = $('#memberPhone').val().trim();
+    var level = $('#memberLevel').val();
+    
+    if (!name) {
+        alert('会员姓名不能为空');
+        return;
+    }
+    
+    var url = action === 'add' ? '{% url "members:member_add" %}' : '{% url "members:member_edit" %}';
+    var data = {
+        'csrfmiddlewaretoken': '{{ csrf_token }}',
+        'name': name,
+        'phone': phone,
+        'level': level
+    };
+    
+    if (action === 'edit') {
+        data.member_id = memberId;
+    }
+    
+    $.ajax({
+        url: url,
+        type: 'POST',
+        data: data,
+        success: function(response) {
+            if (response.success) {
+                alert(response.message);
+                closeModal();
+                // 重新加载当前页面
+                var currentUrl = window.location.pathname + window.location.search;
+                loadPage(currentUrl);
+            } else {
+                alert(response.message);
+            }
+        },
+        error: function() {
+            alert('操作失败，请稍后重试');
+        }
+    });
+}
+
+// 删除会员
+function deleteMember(memberId, memberName) {
+    if (confirm('确定要删除会员 "' + memberName + '" 吗？\n\n此操作不可恢复！')) {
+        $.ajax({
+            url: '/members/delete/' + memberId + '/',
+            type: 'POST',
+            data: {
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+                if (response.success) {
+                    alert(response.message);
+                    // 重新加载当前页面
+                    var currentUrl = window.location.pathname + window.location.search;
+                    loadPage(currentUrl);
+                } else {
+                    alert('删除失败：' + response.message);
+                }
+            },
+            error: function() {
+                alert('删除失败，请稍后重试');
+            }
+        });
+    }
+}
+
+// 打开充值模态框
+function openRechargeModal(memberId, memberName) {
+    $('#rechargeMemberId').val(memberId);
+    $('#rechargeMemberName').val(memberName);
+    $('#rechargeAmount').val('');
+    $('#rechargeModal').addClass('show');
+}
+
+// 关闭充值模态框
+function closeRechargeModal() {
+    $('#rechargeModal').removeClass('show');
+}
+
+// 保存充值
+function saveRecharge() {
+    var memberId = $('#rechargeMemberId').val();
+    var amount = $('#rechargeAmount').val();
+    
+    if (!amount || parseFloat(amount) == 0) {
+        alert('请输入有效的充值金额');
+        return;
+    }
+    
+    $.ajax({
+        url: '{% url "members:member_recharge" %}',
+        type: 'POST',
+        data: {
+            'csrfmiddlewaretoken': '{{ csrf_token }}',
+            'member_id': memberId,
+            'amount': amount
+        },
+        success: function(response) {
+            if (response.success) {
+                alert(response.message);
+                closeRechargeModal();
+                // 重新加载当前页面
+                var currentUrl = window.location.pathname + window.location.search;
+                loadPage(currentUrl);
+            } else {
+                alert(response.message);
+            }
+        },
+        error: function() {
+            alert('充值失败，请稍后重试');
+        }
+    });
+}
+
+// 打开积分调整模态框
+function openPointsModal(memberId, memberName, currentPoints) {
+    $('#pointsMemberId').val(memberId);
+    $('#pointsMemberName').val(memberName);
+    $('#currentPoints').val(currentPoints);
+    $('#pointsAmount').val('');
+    $('#pointsAdjustType').val('add');
+    $('#pointsAdjustTypeSelect').val('add');
+    $('#pointsModal').addClass('show');
+}
+
+// 关闭积分调整模态框
+function closePointsModal() {
+    $('#pointsModal').removeClass('show');
+}
+
+// 保存积分调整
+function savePoints() {
+    var memberId = $('#pointsMemberId').val();
+    var points = $('#pointsAmount').val();
+    var adjustType = $('#pointsAdjustType').val();
+    
+    if (!points || parseInt(points) <= 0) {
+        alert('请输入有效的积分数量');
+        return;
+    }
+    
+    $.ajax({
+        url: '{% url "members:member_adjust_points" %}',
+        type: 'POST',
+        data: {
+            'csrfmiddlewaretoken': '{{ csrf_token }}',
+            'member_id': memberId,
+            'points': points,
+            'adjust_type': adjustType
+        },
+        success: function(response) {
+            if (response.success) {
+                alert(response.message);
+                closePointsModal();
+                // 重新加载当前页面
+                var currentUrl = window.location.pathname + window.location.search;
+                loadPage(currentUrl);
+            } else {
+                alert(response.message);
+            }
+        },
+        error: function() {
+            alert('积分调整失败，请稍后重试');
+        }
+    });
+}
+
+// 更新菜单激活状态
+{% if active_menu %}
+window.pendingMenuUpdate = '{{ active_menu }}';
+{% endif %}
+</script>

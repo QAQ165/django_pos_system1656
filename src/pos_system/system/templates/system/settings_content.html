@@ -1,0 +1,770 @@
+<style>
+
+    /* 设置页面样式 */
+
+
+    .settings-section {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        padding: 25px;
+        margin-bottom: 25px;
+    }
+    
+    .section-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .section-title i {
+        color: #667eea;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-label {
+        font-weight: 500;
+        color: #555;
+        margin-bottom: 8px;
+        display: block;
+    }
+    
+    .form-control {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 10px 15px;
+        transition: all 0.3s;
+    }
+    
+    .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .form-select {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 10px 15px;
+    }
+    
+    .form-check-input:checked {
+        background-color: #667eea;
+        border-color: #667eea;
+    }
+    
+    .form-text {
+        color: #888;
+        font-size: 13px;
+        margin-top: 5px;
+    }
+    
+    /* 备份时间显示 */
+    .backup-time-display {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+        margin-top: 10px;
+    }
+    
+    .backup-time-display .time-label {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 5px;
+    }
+    
+    .backup-time-display .time-value {
+        font-size: 18px;
+        font-weight: 600;
+        color: #667eea;
+    }
+    
+    /* 备份日志表格 */
+    .backup-log-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .backup-log-table th,
+    .backup-log-table td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .backup-log-table th {
+        background: #f8f9fa;
+        font-weight: 600;
+        color: #555;
+        font-size: 14px;
+    }
+    
+    .backup-log-table td {
+        font-size: 14px;
+        color: #666;
+    }
+    
+    .backup-log-table tr:hover td {
+        background: #f8f9fa;
+    }
+    
+    /* 状态标签 */
+    .status-badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+    
+    .status-badge.success {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+    
+    .status-badge.failed {
+        background: #ffebee;
+        color: #c62828;
+    }
+    
+    /* 按钮样式 */
+
+    .page-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+    .btn-save {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        color: white;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .btn-save:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    
+    /* 数据恢复按钮样式 */
+    .btn-restore {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        border: none;
+        color: white;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .btn-restore::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        transition: left 0.5s;
+    }
+    
+    .btn-restore:hover::before {
+        left: 100%;
+    }
+    
+    .btn-restore:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
+    }
+    
+    .btn-restore:active {
+        transform: translateY(0);
+    }
+    
+    .btn-backup {
+        background: #27ae60;
+        border: none;
+        color: white;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .btn-backup:hover {
+        background: #229954;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(39, 174, 96, 0.4);
+    }
+    
+    .btn-backup:disabled {
+        background: #95a5a6;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+    
+    /* 空状态 */
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: #999;
+    }
+    
+    .empty-state i {
+        font-size: 50px;
+        margin-bottom: 15px;
+        opacity: 0.3;
+    }
+    
+    /* 提示信息 */
+    .alert {
+        border-radius: 8px;
+        padding: 15px 20px;
+        margin-bottom: 20px;
+    }
+    
+    .alert-success {
+        background: #e8f5e9;
+        border: 1px solid #c8e6c9;
+        color: #2e7d32;
+    }
+    
+    .alert-error {
+        background: #ffebee;
+        border: 1px solid #ffcdd2;
+        color: #c62828;
+    }
+    
+    /* 加载动画 */
+    .spinner {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(255,255,255,0.3);
+        border-top-color: white;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        margin-right: 8px;
+        vertical-align: middle;
+    }
+    
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+    
+</style>
+
+<!-- 页面标题 -->
+<div class="page-header">
+    <h1 class="page-title">系统设置</h1>
+    <div class="page-actions">
+        <button class="btn-save" id="saveBtn" onclick="saveSettings()">
+            <i class="bi bi-check-circle"></i>
+            保存设置
+        </button>
+        <button class="btn-restore" id="restoreBtn"  onclick="showRestoreModal()">
+            <i class="bi bi-arrow-counterclockwise"></i>
+            数据恢复
+        </button>
+    </div>
+</div>
+
+<!-- 提示信息区域 -->
+<div id="alertArea" style="display: none;"></div>
+
+<!-- 基本设置 -->
+<div class="settings-section">
+    <h3 class="section-title">
+        <i class="bi bi-info-circle"></i>
+        基本设置
+    </h3>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label class="form-label">系统名称</label>
+                <input type="text" class="form-control" id="systemName" 
+                       value="{{ config.system_name }}" placeholder="请输入系统名称">
+                <div class="form-text">显示在页面标题和登录页面的系统名称</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 数据备份设置 -->
+<div class="settings-section">
+    <h3 class="section-title">
+        <i class="bi bi-cloud-arrow-up"></i>
+        数据备份设置
+    </h3>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label class="form-label">备份策略</label>
+                <select class="form-select" id="backupType" onchange="onBackupTypeChange()">
+                    <option value="manual" {% if config.backup_type == 'manual' %}selected{% endif %}>手动备份</option>
+                    <option value="auto" {% if config.backup_type == 'auto' %}selected{% endif %}>定期备份</option>
+                </select>
+                <div class="form-text">手动备份需要管理员手动执行，定期备份会按设定时间自动执行</div>
+            </div>
+        </div>
+        
+        <div class="col-md-6" id="backupPeriodSection" 
+             style="{% if config.backup_type == 'manual' %}display: none;{% endif %}">
+            <div class="form-group">
+                <label class="form-label">备份周期</label>
+                <select class="form-select" id="backupPeriod" onchange="onBackupPeriodChange()">
+                    <option value="daily" {% if config.backup_period == 'daily' %}selected{% endif %}>每天</option>
+                    <option value="weekly" {% if config.backup_period == 'weekly' %}selected{% endif %}>每周</option>
+                    <option value="monthly" {% if config.backup_period == 'monthly' %}selected{% endif %}>每月</option>
+                </select>
+                <div class="form-text">选择定期备份的执行周期</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 备份时间显示 -->
+    <div class="backup-time-display" id="backupTimeDisplay" 
+         style="{% if config.backup_type == 'manual' %}display: none;{% endif %}">
+        <div class="time-label">下次备份时间</div>
+        <div class="time-value" id="nextBackupTime">
+            {% if config.backup_period == 'daily' %}
+                每天 00:00
+            {% elif config.backup_period == 'weekly' %}
+                每周一 00:00
+            {% elif config.backup_period == 'monthly' %}
+                每月1号 00:00
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- 手动备份按钮 -->
+    <div class="mt-4" id="manualBackupSection" 
+         style="{% if config.backup_type == 'auto' %}display: none;{% endif %}">
+        <button class="btn-backup" id="backupBtn" onclick="manualBackup()">
+            <i class="bi bi-download"></i>
+            立即备份
+        </button>
+        <div class="form-text mt-2">点击按钮立即执行一次数据备份</div>
+    </div>
+</div>
+
+<!-- 安全设置 -->
+<div class="settings-section">
+    <h3 class="section-title">
+        <i class="bi bi-shield-check"></i>
+        安全设置
+    </h3>
+    
+    <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" id="enableCaptcha" 
+               {% if config.enable_captcha %}checked{% endif %}>
+        <label class="form-check-label" for="enableCaptcha">
+            启用登录验证码
+        </label>
+    </div>
+    <div class="form-text">开启后，用户登录时需要输入图形验证码，提高系统安全性</div>
+</div>
+
+<!-- 积分赠送设置 -->
+<div class="settings-section">
+    <h3 class="section-title">
+        <i class="bi bi-gift"></i>
+        积分赠送设置
+    </h3>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label class="form-label">满额金额(元)</label>
+                <input type="number" class="form-control" id="thresholdAmount" 
+                       value="{{ config.threshold_amount }}" placeholder="0" step="0.01" min="0">
+                <div class="form-text">消费满此金额时赠送积分</div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="form-group">
+                <label class="form-label">赠送积分</label>
+                <input type="number" class="form-control" id="rewardPoints" 
+                       value="{{ config.reward_points }}" placeholder="0" step="1" min="0">
+                <div class="form-text">满额后赠送的积分数量</div>
+            </div>
+        </div>
+    </div>
+    <div class="form-text mt-2">
+        <strong>说明：</strong>当任意一个值为0时表示不赠送积分；未输入会员时也不赠送积分
+    </div>
+</div>
+
+<!-- 备份日志 -->
+<div class="settings-section">
+    <h3 class="section-title">
+        <i class="bi bi-clock-history"></i>
+        备份历史
+    </h3>
+    
+    {% if backup_logs %}
+    <div class="table-responsive">
+        <table class="backup-log-table">
+            <thead>
+                <tr>
+                    <th>备份时间</th>
+                    <th>备份类型</th>
+                    <th>文件名</th>
+                    <th>文件大小</th>
+                    <th>操作人</th>
+                    <th>状态</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in backup_logs %}
+                <tr>
+                    <td>{{ log.created_at|date:"Y-m-d H:i" }}</td>
+                    <td>{{ log.get_backup_type_display }}</td>
+                    <td>{{ log.file_name }}</td>
+                    <td>{{ log.file_size|filesizeformat }}</td>
+                    <td>{{ log.operator.username|default:"系统" }}</td>
+                    <td>
+                        {% if log.status == 'success' %}
+                            <span class="status-badge success">成功</span>
+                        {% else %}
+                            <span class="status-badge failed">失败</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="bi bi-inbox"></i>
+        <p>暂无备份记录</p>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    // 备份类型改变时
+    function onBackupTypeChange() {
+        var backupType = $('#backupType').val();
+        var $periodSection = $('#backupPeriodSection');
+        var $timeDisplay = $('#backupTimeDisplay');
+        var $manualSection = $('#manualBackupSection');
+        
+        if (backupType === 'auto') {
+            $periodSection.show();
+            $timeDisplay.show();
+            $manualSection.hide();
+            onBackupPeriodChange();
+        } else {
+            $periodSection.hide();
+            $timeDisplay.hide();
+            $manualSection.show();
+        }
+    }
+    
+    // 备份周期改变时
+    function onBackupPeriodChange() {
+        var period = $('#backupPeriod').val();
+        var $timeDisplay = $('#nextBackupTime');
+        
+        var timeText = '';
+        switch (period) {
+            case 'daily':
+                timeText = '每天 00:00';
+                break;
+            case 'weekly':
+                timeText = '每周一 00:00';
+                break;
+            case 'monthly':
+                timeText = '每月1号 00:00';
+                break;
+        }
+        $timeDisplay.text(timeText);
+    }
+    
+    // 保存设置
+    function saveSettings() {
+        var $saveBtn = $('#saveBtn');
+        var originalText = $saveBtn.html();
+        
+        // 显示加载状态
+        $saveBtn.html('<span class="spinner"></span>保存中...');
+        $saveBtn.prop('disabled', true);
+        
+        // 获取表单数据
+        var formData = new FormData();
+        formData.append('action', 'save_config');
+        formData.append('system_name', $('#systemName').val());
+        formData.append('backup_type', $('#backupType').val());
+        formData.append('backup_period', $('#backupPeriod').val());
+        formData.append('enable_captcha', $('#enableCaptcha').is(':checked') ? 'on' : '');
+        formData.append('threshold_amount', $('#thresholdAmount').val());
+        formData.append('reward_points', $('#rewardPoints').val());
+        
+        // 发送请求
+        $.ajax({
+            url: window.location.href,
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            success: function(data) {
+                // 恢复按钮状态
+                $saveBtn.html(originalText);
+                $saveBtn.prop('disabled', false);
+                
+                // 显示提示
+                showAlert(data.success ? 'success' : 'error', data.message);
+            },
+            error: function(xhr) {
+                $saveBtn.html(originalText);
+                $saveBtn.prop('disabled', false);
+                showAlert('error', '保存失败：' + xhr.statusText);
+            }
+        });
+    }
+    
+    // 手动备份
+    function manualBackup() {
+        var $backupBtn = $('#backupBtn');
+        var originalText = $backupBtn.html();
+        
+        // 显示加载状态
+        $backupBtn.html('<span class="spinner"></span>备份中...');
+        $backupBtn.prop('disabled', true);
+        
+        // 获取表单数据
+        var formData = new FormData();
+        formData.append('action', 'manual_backup');
+        
+        // 发送请求
+        $.ajax({
+            url: window.location.href,
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            success: function(data) {
+                // 恢复按钮状态
+                $backupBtn.html(originalText);
+                $backupBtn.prop('disabled', false);
+                
+                // 显示提示
+                showAlert(data.success ? 'success' : 'error', data.message);
+                
+                // 如果备份成功，刷新页面显示新的备份记录
+                if (data.success) {
+                    setTimeout(function() {
+                        loadPage(window.location.href);
+                    }, 1500);
+                }
+            },
+            error: function(xhr) {
+                $backupBtn.html(originalText);
+                $backupBtn.prop('disabled', false);
+                showAlert('error', '备份失败：' + xhr.statusText);
+            }
+        });
+    }
+    
+    // 显示提示信息
+    function showAlert(type, message) {
+        var $alertArea = $('#alertArea');
+        var alertClass = type === 'success' ? 'alert-success' : 'alert-error';
+        var icon = type === 'success' ? 'bi-check-circle' : 'bi-exclamation-circle';
+        
+        $alertArea.html(
+            '<div class="alert ' + alertClass + '">' +
+            '<i class="bi ' + icon + '"></i>' +
+            message +
+            '</div>'
+        );
+        $alertArea.show();
+        
+        // 3秒后自动隐藏
+        setTimeout(function() {
+            $alertArea.hide();
+        }, 3000);
+    }
+    
+    // 显示数据恢复模态框
+    function showRestoreModal() {
+        // 加载备份文件列表
+        $.ajax({
+            url: '/system/get-backup-files',
+            type: 'GET',
+            success: function(response) {
+                if (response.code !== '1') {
+                    showAlert('error', response.message);
+                    return;
+                }
+                
+                var backupFiles = response.data;
+                
+                // 创建模态框
+                var modal = `
+                    <div class="modal-overlay" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 10000; display: flex; align-items: center; justify-content: center;">
+                        <div class="modal-content" style="background: white; border-radius: 8px; padding: 20px; width: 90%; max-width: 1000px; max-height: 80vh; overflow-y: auto;">
+                            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                                <h3>数据恢复</h3>
+                                <button onclick="hideRestoreModal()" style="background: none; border: none; font-size: 20px; cursor: pointer;">&times;</button>
+                            </div>
+                            <div class="modal-body">
+                                <p style="margin-bottom: 15px;">请选择要恢复的备份点：</p>
+                                <div class="backup-list">
+                                    <table class="table" style="width: 100%; border-collapse: collapse;">
+                                        <thead>
+                                            <tr style="border-bottom: 2px solid #ddd;">
+                                                <th style="padding: 10px; text-align: left;">备份时间</th>
+                                                <th style="padding: 10px; text-align: left;">备份类型</th>
+                                                <th style="padding: 10px; text-align: left;">文件名</th>
+                                                <th style="padding: 10px; text-align: left;">文件大小</th>
+                                                <th style="padding: 10px; text-align: left;">操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                `;
+                
+                // 遍历备份文件列表
+                if (backupFiles.length === 0) {
+                    modal += `
+                        <tr>
+                            <td colspan="5" style="padding: 20px; text-align: center; color: #999;">暂无备份文件</td>
+                        </tr>
+                    `;
+                } else {
+                    backupFiles.forEach(function(file) {
+                        var fileSize = formatFileSize(file.file_size);
+                        modal += `
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="padding: 10px;">${file.created_at}</td>
+                                <td style="padding: 10px;">${file.backup_type}</td>
+                                <td style="padding: 10px;">${file.filename}</td>
+                                <td style="padding: 10px;">${fileSize}</td>
+                                <td style="padding: 10px;">
+                                    <button onclick="confirmRestore('${file.filepath}')" style="background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+                                        恢复
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                }
+                
+                modal += `
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // 添加到页面
+                document.body.insertAdjacentHTML('beforeend', modal);
+            },
+            error: function() {
+                showAlert('error', '加载备份文件列表失败');
+            }
+        });
+    }
+    
+    // 格式化文件大小
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 B';
+        var k = 1024;
+        var sizes = ['B', 'KB', 'MB', 'GB'];
+        var i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+    
+    // 隐藏数据恢复模态框
+    function hideRestoreModal() {
+        var modal = document.querySelector('.modal-overlay');
+        if (modal) {
+            modal.remove();
+        }
+    }
+    
+    // 确认恢复
+    function confirmRestore(backupFilepath) {
+        if (confirm('确定要恢复此备份吗？\n\n恢复前会先进行一次当前数据的备份，然后替换所有数据。\n恢复完成后需要重启应用。\n\n此操作不可逆，是否继续？')) {
+            // 执行恢复操作
+            var $restoreBtn = $('#restoreBtn');
+            var originalText = $restoreBtn.html();
+            
+            // 显示加载状态
+            $restoreBtn.html('<span class="spinner"></span>恢复中...');
+            $restoreBtn.prop('disabled', true);
+            
+            // 获取表单数据
+            var formData = new FormData();
+            formData.append('action', 'restore_data');
+            formData.append('backup_filepath', backupFilepath);
+            
+            // 发送请求
+            $.ajax({
+                url: window.location.href,
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                success: function(data) {
+                    // 恢复按钮状态
+                    $restoreBtn.html(originalText);
+                    $restoreBtn.prop('disabled', false);
+                    
+                    // 隐藏模态框
+                    hideRestoreModal();
+                    
+                    // 显示提示
+                    showAlert(data.success ? 'success' : 'error', data.message);
+                    
+                    // 如果恢复成功且有重定向URL，延迟2秒后重定向
+                    if (data.success && data.redirect) {
+                        setTimeout(function() {
+                            window.location.href = data.redirect;
+                        }, 2000);
+                    }
+                },
+                error: function(xhr) {
+                    $restoreBtn.html(originalText);
+                    $restoreBtn.prop('disabled', false);
+                    showAlert('error', '恢复失败：' + xhr.statusText);
+                }
+            });
+        }
+    }
+</script>

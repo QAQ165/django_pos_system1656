@@ -1,0 +1,676 @@
+
+<style>
+
+   /* 按钮样式 */
+        .btn-add, .btn-save, .btn-primary-custom {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        
+        .btn-add:hover, .btn-save:hover, .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+
+/* 模态框层级调整 */
+#batchImportModal, #importResultModal {
+    z-index: 1055 !important;
+}
+
+.modal-backdrop {
+    z-index: 1050 !important;
+}
+
+.filter-section {
+    background: #f0f7ff;
+    padding: 16px 20px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    border: 1px solid #d6e8ff;
+}
+
+.filter-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.filter-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filter-item label {
+    font-weight: 500;
+    color: #4a6fa5;
+    white-space: nowrap;
+    font-size: 14px;
+}
+
+.filter-item .form-select,
+.filter-item .form-control {
+    min-width: 140px;
+    padding: 6px 12px;
+    border: 1px solid #b8d4f0;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.filter-item .form-select:focus,
+.filter-item .form-control:focus {
+    border-color: #4a90e2;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.15);
+}
+
+.btn-primary,
+.btn-secondary {
+    padding: 6px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 14px;
+}
+
+.btn-primary {
+    background: #4a90e2;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #357abd;
+}
+
+.btn-secondary {
+    background: #e8f1f8;
+    color: #4a6fa5;
+    border: 1px solid #b8d4f0;
+}
+
+.btn-secondary:hover {
+    background: #d6e8ff;
+}
+
+.table {
+    margin-bottom: 0;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.table th {
+    background: #e8f4fc;
+    color: #2c5aa0;
+    font-weight: 600;
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 2px solid #b8d4f0;
+    font-size: 14px;
+}
+
+.table td {
+    vertical-align: middle;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e8f1f8;
+    font-size: 14px;
+    color: #333;
+}
+
+.table tbody tr:hover {
+    background: #f5faff;
+}
+
+.table tbody tr:nth-child(even) {
+    background: #fafcfe;
+}
+
+.table tbody tr:nth-child(even):hover {
+    background: #f0f7ff;
+}
+
+.btn-sm {
+    padding: 4px 12px;
+    font-size: 13px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 6px;
+    transition: all 0.2s;
+}
+
+.btn-warning {
+    background: #fff3e0;
+    color: #f57c00;
+    border: 1px solid #ffe0b2;
+    text-decoration: none;
+}
+
+.btn-warning:hover {
+    background: #ffe0b2;
+}
+
+.btn-danger {
+    background: #ffebee;
+    color: #c62828;
+    border: 1px solid #ffcdd2;
+}
+
+.btn-danger:hover {
+    background: #ffcdd2;
+}
+
+.badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.bg-success {
+    background: #e8f5e8;
+  
+}
+
+.bg-secondary {
+    background: #f5f5f5;
+ 
+}
+
+.pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #e8f1f8;
+}
+
+.pagination {
+    margin: 0;
+}
+
+.page-item .page-link {
+    color: #4a90e2;
+    border: 1px solid #d6e8ff;
+    padding: 6px 12px;
+}
+
+.page-item.active .page-link {
+    background: #4a90e2;
+    border-color: #4a90e2;
+    color: white;
+}
+
+.page-item.disabled .page-link {
+    color: #b8d4f0;
+    border-color: #e8f1f8;
+}
+
+.page-info {
+    color: #6b8cae;
+    font-size: 13px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #8fa8c8;
+}
+
+.empty-state i {
+    font-size: 48px;
+    margin-bottom: 16px;
+    display: block;
+    color: #b8d4f0;
+}
+
+.empty-state h3 {
+    font-size: 16px;
+    margin-bottom: 8px;
+    color: #6b8cae;
+    font-weight: 500;
+}
+
+.empty-state p {
+    font-size: 13px;
+    color: #9ab;
+}
+</style>
+
+
+<!-- 页面标题 -->
+<div class="page-header">
+    <h1 class="page-title">商品列表</h1>
+    <div class="page-actions">
+        <a href="{% url 'products:product_add' %}" class="btn-add">
+            <i class="bi bi-plus-circle"></i>
+            新增商品
+        </a>
+        <button id="batchImportBtn" class="btn-add" style="margin-left: 10px;">
+            <i class="bi bi-file-earmark-excel"></i>
+            批量导入
+        </button>
+    </div>
+    
+</div>
+
+<!-- 批量导入模态框 -->
+<div class="modal fade" id="batchImportModal" tabindex="-1" aria-labelledby="batchImportModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="batchImportModalLabel">批量导入商品</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="importStep1" class="import-step">
+                    <p style="margin-bottom: 20px;">是否需要下载导入模板？</p>
+                    <div style="display: flex; gap: 10px;">
+                        <button id="downloadTemplateBtn" class="btn btn-primary">
+                            <i class="bi bi-download"></i> 下载模板
+                        </button>
+                        <button id="skipTemplateBtn" class="btn btn-secondary">
+                            <i class="bi bi-arrow-right"></i> 直接上传文件
+                        </button>
+                    </div>
+                </div>
+                <div id="importStep2" class="import-step" style="display: none;">
+                    <p style="margin-bottom: 15px;">请选择要上传的Excel文件：</p>
+                    <input type="file" id="excelFileInput" class="form-control" accept=".xlsx, .xls">
+                    <small class="text-muted" style="display: block; margin-top: 10px;">
+                        支持 .xlsx 和 .xls 格式，最多处理100条数据
+                    </small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button id="uploadBtn" class="btn btn-primary" style="display: none;">
+                    <i class="bi bi-upload"></i> 上传并导入
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 导入结果模态框 -->
+<div class="modal fade" id="importResultModal" tabindex="-1" aria-labelledby="importResultModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="importResultModalLabel">导入结果</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center" style="padding: 20px 0;">
+                    <div class="mb-3">
+                        <i class="bi bi-check-circle" style="font-size: 48px; color: #28a745;"></i>
+                    </div>
+                    <p id="resultMessage" class="mb-3"></p>
+                    <div class="result-stats">
+                        <span class="text-success">成功：<span id="successCount">0</span> 条</span>
+                        <span style="margin: 0 15px;">|</span>
+                        <span class="text-danger">失败：<span id="failedCount">0</span> 条</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 内容区域 -->
+<div class="card">
+    <div class="card-body">
+        <!-- 筛选和搜索区域 -->
+        <div class="filter-section">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>上架状态：</label>
+                    <select id="statusFilter" class="form-select">
+                        <option value="">全部</option>
+                        <option value="1" {% if status_filter == '1' %}selected{% endif %}>上架</option>
+                        <option value="0" {% if status_filter == '0' %}selected{% endif %}>下架</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>商品分类：</label>
+                    <input type="text" id="categorySearch" class="form-control" placeholder="输入分类名称" value="{{ category_search }}">
+                    <input type="hidden" id="categoryFilter" value="{{ category_filter }}">
+                </div>
+                <div class="filter-item">
+                    <label>上架时间：</label>
+                    <div class="date-range" style="display: flex; align-items: center; gap: 8px;">
+                        <input type="date" id="startDate" class="form-control" value="{{ start_date }}">
+                        <span>至</span>
+                        <input type="date" id="endDate" class="form-control" value="{{ end_date }}">
+                    </div>
+                </div>
+                <div class="filter-item">
+                    <label>搜索：</label>
+                    <div class="search-box" style="display: flex; gap: 8px;">
+                        <input type="text" id="searchInput" class="form-control" placeholder="商品名称、条码" value="{{ search_query }}">
+                    </div>
+                </div>
+                <div class="filter-item">
+                    <button id="searchBtn" class="btn-primary">
+                        <i class="bi bi-search"></i>
+                        搜索
+                    </button>
+                    <button id="resetBtn" class="btn-secondary">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                        重置
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 商品列表 -->
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>条形码</th>
+                        <th>商品名称</th>
+                        <th>分类</th>
+                        <th>零售价</th>
+                        <th>成本价</th>
+                        <th>库存</th>
+                        <th>单位</th>
+                        <th>状态</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr>
+                        <td>{{ product.id }}</td>
+                        <td>{{ product.barcode|default:'-' }}</td>
+                        <td>{{ product.name }}</td>
+                        <td>{{ product.category.name }}</td>
+                        <td>¥{{ product.price }}</td>
+                        <td>¥{{ product.cost }}</td>
+                        <td>{{ product.stock }}</td>
+                        <td>{{ product.unit }}</td>
+                        <td>
+                            {% if product.status %}
+                            <span class="badge bg-success">上架</span>
+                            {% else %}
+                            <span class="badge bg-secondary">下架</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ product.create_time|date:'Y-m-d H:i' }}</td>
+                        <td>
+                            <a href="{% url 'products:product_edit' product.id %}" class="btn-sm btn-warning">
+                                <i class="bi bi-pencil"></i>
+                                编辑
+                            </a>
+                            <button class="btn-sm btn-danger" onclick="deleteProduct({{ product.id }}, '{{ product.name|escapejs }}')">
+                                <i class="bi bi-trash"></i>
+                                删除
+                            </button>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="11" class="text-center">
+                            <div class="empty-state">
+                                <i class="bi bi-box-seam"></i>
+                                <h3>暂无商品数据</h3>
+                                <p>点击"新增商品"按钮添加第一个商品</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 分页 -->
+        {% if products.paginator.num_pages > 1 %}
+        <div class="pagination-container">
+            <nav>
+                <ul class="pagination">
+                    {% if products.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="javascript:void(0)" onclick="goToPage(1)">首页</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="javascript:void(0)" onclick="goToPage({{ products.previous_page_number }})">上一页</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">首页</span>
+                        </li>
+                        <li class="page-item disabled">
+                            <span class="page-link">上一页</span>
+                        </li>
+                    {% endif %}
+
+                    {% for num in products.paginator.page_range %}
+                        {% if num == products.number %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                        {% elif num > products.number|add:'-3' and num < products.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="javascript:void(0)" onclick="goToPage({{ num }})">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if products.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="javascript:void(0)" onclick="goToPage({{ products.next_page_number }})">下一页</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="javascript:void(0)" onclick="goToPage({{ products.paginator.num_pages }})">末页</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">下一页</span>
+                        </li>
+                        <li class="page-item disabled">
+                            <span class="page-link">末页</span>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            <div class="page-info">
+                第 {{ products.number }} 页 / 共 {{ products.paginator.num_pages }} 页
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+
+<script>
+$(document).ready(function() {
+    // 筛选按钮点击事件
+    $('#searchBtn').click(function() {
+        var status = $('#statusFilter').val();
+        var categorySearch = $('#categorySearch').val();
+        var search = $('#searchInput').val();
+        var startDate = $('#startDate').val();
+        var endDate = $('#endDate').val();
+        
+        var url = '{% url "products:product_list" %}?';
+        if (status) url += 'status=' + status + '&';
+        if (categorySearch) url += 'category_search=' + encodeURIComponent(categorySearch) + '&';
+        if (search) url += 'search=' + encodeURIComponent(search) + '&';
+        if (startDate) url += 'start_date=' + startDate + '&';
+        if (endDate) url += 'end_date=' + endDate + '&';
+        
+        // 移除末尾的&符号
+        url = url.replace(/&$/, '');
+        
+        loadPage(url);
+    });
+    
+    // 重置按钮点击事件
+    $('#resetBtn').click(function() {
+        $('#statusFilter').val('');
+        $('#categorySearch').val('');
+        $('#categoryFilter').val('');
+        $('#searchInput').val('');
+        $('#startDate').val('');
+        $('#endDate').val('');
+        
+        loadPage('{% url "products:product_list" %}');
+    });
+    
+
+    // 回车键搜索
+    $('#searchInput, #categorySearch').keypress(function(e) {
+        if (e.which == 13) {
+            $('#searchBtn').click();
+        }
+    });
+});
+
+// 删除商品函数
+function deleteProduct(productId, productName) {
+    if (confirm('确定要删除商品 "' + productName + '" 吗？\n\n此操作不可恢复！')) {
+        $.ajax({
+            url: '/products/delete/' + productId + '/',
+            type: 'POST',
+            data: {
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+                if (response.success) {
+                    alert(response.message);
+                    // 重新加载当前页面
+                    location.reload();
+                } else {
+                    alert('删除失败：' + response.message);
+                }
+            },
+            error: function() {
+                alert('删除失败，请稍后重试');
+            }
+        });
+    }
+}
+
+// 分页跳转函数
+function goToPage(pageNum) {
+    var status = $('#statusFilter').val();
+    var categorySearch = $('#categorySearch').val();
+    var search = $('#searchInput').val();
+    var startDate = $('#startDate').val();
+    var endDate = $('#endDate').val();
+    
+    var url = '{% url "products:product_list" %}?page=' + pageNum;
+    if (status) url += '&status=' + status;
+    if (categorySearch) url += '&category_search=' + encodeURIComponent(categorySearch);
+    if (search) url += '&search=' + encodeURIComponent(search);
+    if (startDate) url += '&start_date=' + startDate;
+    if (endDate) url += '&end_date=' + endDate;
+    
+    loadPage(url);
+}
+
+// 更新菜单激活状态
+{% if active_menu %}
+window.pendingMenuUpdate = '{{ active_menu }}';
+{% endif %}
+
+// 批量导入功能
+$(document).ready(function() {
+    // 打开批量导入模态框
+    $('#batchImportBtn').click(function() {
+        $('#importStep1').show();
+        $('#importStep2').hide();
+        $('#uploadBtn').hide();
+        $('#batchImportModal').modal('show');
+    });
+    
+    // 下载模板
+    $('#downloadTemplateBtn').click(function() {
+        window.location.href = '/static/商品导入模板.xlsx';
+    });
+    
+    // 跳过模板，直接上传
+    $('#skipTemplateBtn').click(function() {
+        $('#importStep1').hide();
+        $('#importStep2').show();
+        $('#uploadBtn').show();
+    });
+    
+    // 上传文件并导入
+    $('#uploadBtn').click(function() {
+        var fileInput = document.getElementById('excelFileInput');
+        var file = fileInput.files[0];
+        
+        if (!file) {
+            alert('请选择要上传的Excel文件');
+            return;
+        }
+        
+        if (file.size > 10 * 1024 * 1024) { // 10MB限制
+            alert('文件大小不能超过10MB');
+            return;
+        }
+        
+        var formData = new FormData();
+        formData.append('excel_file', file);
+        
+        // 显示加载状态
+        $('#uploadBtn').html('<i class="bi bi-spinner bi-spin"></i> 导入中...');
+        $('#uploadBtn').prop('disabled', true);
+        
+        $.ajax({
+            url: '{% url "products:batch_import" %}',
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+                if (response.code === '1') {
+                    // 显示结果
+                    $('#successCount').text(response.data.success_count);
+                    $('#failedCount').text(response.data.failed_count);
+                    $('#resultMessage').text(response.message);
+                    $('#batchImportModal').modal('hide');
+                    $('#importResultModal').modal('show');
+                    
+                    // 重新加载页面
+                    setTimeout(function() {
+                        location.reload();
+                    }, 2000);
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function() {
+                alert('导入失败，请稍后重试');
+            },
+            complete: function() {
+                $('#uploadBtn').html('<i class="bi bi-upload"></i> 上传并导入');
+                $('#uploadBtn').prop('disabled', false);
+            }
+        });
+    });
+});
+</script>

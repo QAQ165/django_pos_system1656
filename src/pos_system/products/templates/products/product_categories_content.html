@@ -1,0 +1,461 @@
+
+<style>
+   /* 按钮样式 */
+        .btn-add, .btn-save, .btn-primary-custom {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        
+        .btn-add:hover, .btn-save:hover, .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+
+.filter-section {
+    background: #f0f7ff;
+    padding: 16px 20px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    border: 1px solid #d6e8ff;
+}
+
+.filter-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.filter-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filter-item label {
+    font-weight: 500;
+    color: #4a6fa5;
+    white-space: nowrap;
+    font-size: 14px;
+}
+
+.filter-item .form-select,
+.filter-item .form-control {
+    min-width: 140px;
+    padding: 6px 12px;
+    border: 1px solid #b8d4f0;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.filter-item .form-select:focus,
+.filter-item .form-control:focus {
+    border-color: #4a90e2;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.15);
+}
+
+.btn-primary,
+.btn-secondary {
+    padding: 6px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 14px;
+}
+
+.btn-primary {
+    background: #4a90e2;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #357abd;
+}
+
+.btn-secondary {
+    background: #e8f1f8;
+    color: #4a6fa5;
+    border: 1px solid #b8d4f0;
+}
+
+.btn-secondary:hover {
+    background: #d6e8ff;
+}
+
+.table {
+    margin-bottom: 0;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.table th {
+    background: #e8f4fc;
+    color: #2c5aa0;
+    font-weight: 600;
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 2px solid #b8d4f0;
+    font-size: 14px;
+}
+
+.table td {
+    vertical-align: middle;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e8f1f8;
+    font-size: 14px;
+    color: #333;
+}
+
+.table tbody tr:hover {
+    background: #f5faff;
+}
+
+.table tbody tr:nth-child(even) {
+    background: #fafcfe;
+}
+
+.table tbody tr:nth-child(even):hover {
+    background: #f0f7ff;
+}
+
+.btn-sm {
+    padding: 4px 12px;
+    font-size: 13px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 6px;
+    transition: all 0.2s;
+}
+
+.btn-info {
+    background: #e3f2fd;
+    color: #1976d2;
+    border: 1px solid #bbdefb;
+}
+
+.btn-info:hover {
+    background: #bbdefb;
+}
+
+.btn-warning {
+    background: #fff3e0;
+    color: #f57c00;
+    border: 1px solid #ffe0b2;
+    text-decoration: none;
+}
+
+.btn-warning:hover {
+    background: #ffe0b2;
+}
+
+.badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.bg-info {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.bg-success {
+    background: #e8f5e8;
+  
+}
+
+.bg-secondary {
+    background: #f5f5f5;
+ 
+}
+
+.pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #e8f1f8;
+}
+
+.pagination {
+    margin: 0;
+}
+
+.page-item .page-link {
+    color: #4a90e2;
+    border: 1px solid #d6e8ff;
+    padding: 6px 12px;
+}
+
+.page-item.active .page-link {
+    background: #4a90e2;
+    border-color: #4a90e2;
+    color: white;
+}
+
+.page-item.disabled .page-link {
+    color: #b8d4f0;
+    border-color: #e8f1f8;
+}
+
+.page-info {
+    color: #6b8cae;
+    font-size: 13px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #8fa8c8;
+}
+
+.empty-state i {
+    font-size: 48px;
+    margin-bottom: 16px;
+    display: block;
+    color: #b8d4f0;
+}
+
+.empty-state h3 {
+    font-size: 16px;
+    margin-bottom: 8px;
+    color: #6b8cae;
+    font-weight: 500;
+}
+
+.empty-state p {
+    font-size: 13px;
+    color: #9ab;
+}
+
+.text-muted {
+    color: #9ab;
+}
+</style>
+
+
+<!-- 页面标题 -->
+<div class="page-header">
+    <h1 class="page-title">商品分类</h1>
+    <div class="page-actions">
+        <a href="{% url 'products:category_add' %}" class="btn-add">
+            <i class="bi bi-plus-circle"></i>
+            新增分类
+        </a>
+    </div>
+</div>
+
+<!-- 内容区域 -->
+<div class="card">
+    <div class="card-body">
+        <!-- 筛选和搜索区域 -->
+        <div class="filter-section">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>分类级别：</label>
+                    <select id="levelFilter" class="form-select">
+                        <option value="">全部</option>
+                        <option value="1" {% if level_filter == '1' %}selected{% endif %}>1级</option>
+                        <option value="2" {% if level_filter == '2' %}selected{% endif %}>2级</option>
+                        <option value="3" {% if level_filter == '3' %}selected{% endif %}>3级</option>
+                        <option value="4" {% if level_filter == '4' %}selected{% endif %}>4级</option>
+                        <option value="5" {% if level_filter == '5' %}selected{% endif %}>5级</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>搜索：</label>
+                    <input type="text" id="searchInput" class="form-control" placeholder="输入分类名称" value="{{ search_query }}">
+                </div>
+                <div class="filter-item">
+                    <button id="searchBtn" class="btn-primary">
+                        <i class="bi bi-search"></i>
+                        搜索
+                    </button>
+                    <button id="resetBtn" class="btn-secondary">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                        重置
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 分类列表 -->
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>分类名称</th>
+                        <th>父分类</th>
+                        <th>排序序号</th>
+                        <th>分类级别</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for category in categories %}
+                    <tr>
+                        <td>{{ category.id }}</td>
+                        <td>{{ category.name }}</td>
+                        <td>
+                            {% if category.parent %}
+                                {{ category.parent.name }} (ID: {{ category.parent.id }})
+                            {% else %}
+                                <span class="text-muted">无</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ category.sort_order }}</td>
+                        <td>
+                            <span class="badge bg-info">{{ category.level }}级</span>
+                        </td>
+                        <td>{{ category.create_time|date:"Y-m-d H:i:s" }}</td>
+                        <td>
+                            <button class="btn-sm btn-info" onclick="viewSubcategories({{ category.id }})">
+                                <i class="bi bi-list-ul"></i>
+                                查询子分类
+                            </button>
+                            <a href="{% url 'products:category_edit' category.id %}" class="btn-sm btn-warning">
+                                <i class="bi bi-pencil"></i>
+                                编辑
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center">
+                            <div class="empty-state">
+                                <i class="bi bi-folder-fill"></i>
+                                <h3>暂无分类数据</h3>
+                                <p>点击"新增分类"按钮添加第一个分类</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 分页 -->
+        {% if categories.has_other_pages %}
+        <div class="pagination-container">
+            <nav>
+                <ul class="pagination">
+                    {% if categories.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1&level={{ level_filter }}&search={{ search_query }}&parent_id={{ parent_id }}">首页</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ categories.previous_page_number }}&level={{ level_filter }}&search={{ search_query }}&parent_id={{ parent_id }}">上一页</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">首页</span>
+                        </li>
+                        <li class="page-item disabled">
+                            <span class="page-link">上一页</span>
+                        </li>
+                    {% endif %}
+
+                    {% for num in categories.paginator.page_range %}
+                        {% if categories.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                        {% elif num > categories.number|add:'-3' and num < categories.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}&level={{ level_filter }}&search={{ search_query }}&parent_id={{ parent_id }}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if categories.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ categories.next_page_number }}&level={{ level_filter }}&search={{ search_query }}&parent_id={{ parent_id }}">下一页</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ categories.paginator.num_pages }}&level={{ level_filter }}&search={{ search_query }}&parent_id={{ parent_id }}">末页</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">下一页</span>
+                        </li>
+                        <li class="page-item disabled">
+                            <span class="page-link">末页</span>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            <div class="page-info">
+                第 {{ categories.number }} 页 / 共 {{ categories.paginator.num_pages }} 页
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+
+<script>
+$(document).ready(function() {
+    var $levelFilter = $('#levelFilter');
+    var $searchInput = $('#searchInput');
+    var $searchBtn = $('#searchBtn');
+    var $resetBtn = $('#resetBtn');
+
+    $searchBtn.on('click', function() {
+        var level = $levelFilter.val();
+        var search = $searchInput.val();
+        var url = new URL(window.location);
+        url.searchParams.set('page', '1');
+        url.searchParams.set('level', level);
+        url.searchParams.set('search', search);
+        url.searchParams.delete('parent_id');
+        loadPage(url.toString());
+    });
+
+    $resetBtn.on('click', function() {
+        var url = new URL(window.location);
+        url.searchParams.delete('level');
+        url.searchParams.delete('search');
+        url.searchParams.delete('parent_id');
+        url.searchParams.set('page', '1');
+        loadPage(url.toString());
+    });
+
+    $searchInput.on('keypress', function(e) {
+        if (e.which === 13) {
+            $searchBtn.trigger('click');
+        }
+    });
+});
+
+function viewSubcategories(categoryId) {
+    var url = new URL(window.location);
+    url.searchParams.set('page', '1');
+    url.searchParams.set('parent_id', categoryId);
+    url.searchParams.delete('level');
+    url.searchParams.delete('search');
+    loadPage(url.toString());
+}
+
+// 更新菜单激活状态
+{% if active_menu %}
+window.pendingMenuUpdate = '{{ active_menu }}';
+{% endif %}
+</script>

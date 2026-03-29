@@ -1,0 +1,1269 @@
+<style>
+ 
+    /* 页面按钮样式 */
+
+          .btn-outline-custom {
+            background: white;
+            border: 1px solid #ddd;
+            color: #666;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .btn-outline-custom:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+        
+        .btn-outline-custom.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: #667eea;
+            color: white;
+        }
+
+</style>
+
+
+<!-- 页面标题 -->
+<div class="page-header">
+    <h1 class="page-title">数据统计</h1>
+    <div class="page-actions">
+        <div class="d-flex gap-2">
+            <select class="form-select" id="reportType">
+                <option value="day">日报</option>
+                <option value="week">周报</option>
+                <option value="month">月报</option>
+            </select>
+            <button class="btn-outline-custom" onclick="exportReport('excel')">
+                <i class="bi bi-file-earmark-excel"></i>
+                导出Excel
+            </button>
+            <button class="btn-outline-custom" onclick="exportReport('print')">
+                <i class="bi bi-printer"></i>
+                打印
+            </button>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- 经营概览 -->
+<div class="content-card mb-4">
+    <h5 style="color: #333; margin-bottom: 10px; font-weight: 600;">
+        <i class="bi bi-bar-chart" style="margin-right: 8px; color: #667eea;"></i>
+        经营概览
+    </h5>
+    
+    <div class="d-flex gap-2 mb-4">
+        <button class="btn-outline-custom active" onclick="changePeriod('day', event)">昨日</button>
+        <button class="btn-outline-custom" onclick="changePeriod('week', event)">本周</button>
+        <button class="btn-outline-custom" onclick="changePeriod('month', event)">本月</button>
+        <button class="btn-outline-custom" onclick="changePeriod('total', event)">累计</button>
+    </div>
+    
+    <!-- 概览卡片 -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="content-card" style="padding: 20px; text-align: center;">
+                <div style="width: 60px; height: 60px; background: #e3f2fd; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
+                    <i class="bi bi-currency-dollar" style="font-size: 28px; color: #1976d2;"></i>
+                </div>
+                <h3 style="font-size: 32px; font-weight: 700; color: #333; margin: 0 0 5px;">¥12,850.00</h3>
+                <p style="color: #888; margin: 0; font-size: 14px;" id="salesLabel">昨日营业额</p>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="content-card" style="padding: 20px; text-align: center;">
+                <div style="width: 60px; height: 60px; background: #f3e5f5; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
+                    <i class="bi bi-receipt" style="font-size: 28px; color: #7b1fa2;"></i>
+                </div>
+                <h3 style="font-size: 32px; font-weight: 700; color: #333; margin: 0 0 5px;">86</h3>
+                <p style="color: #888; margin: 0; font-size: 14px;" id="ordersLabel">昨日订单数</p>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="content-card" style="padding: 20px; text-align: center;">
+                <div style="width: 60px; height: 60px; background: #e8f5e9; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
+                    <i class="bi bi-people" style="font-size: 28px; color: #388e3c;"></i>
+                </div>
+                <h3 style="font-size: 32px; font-weight: 700; color: #333; margin: 0 0 5px;">42</h3>
+                <p style="color: #888; margin: 0; font-size: 14px;" id="customersLabel">昨日顾客数</p>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="content-card" style="padding: 20px; text-align: center;">
+                <div style="width: 60px; height: 60px; background: #fff3e0; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
+                    <i class="bi bi-percent" style="font-size: 28px; color: #f57c00;"></i>
+                </div>
+                <h3 style="font-size: 32px; font-weight: 700; color: #333; margin: 0 0 5px;">15.2%</h3>
+                <p style="color: #888; margin: 0; font-size: 14px;" id="grossMarginLabel">毛利率</p>
+            </div>
+        </div>
+    </div>
+
+        <h5 style="color: #333; margin-bottom: 20px; font-weight: 600;">
+        <i class="bi bi-trending-up" style="margin-right: 8px; color: #667eea;"></i>
+        趋势分析
+    </h5>
+    
+    <div class="mb-4">
+        <div id="trendChart" style="height: 400px;"></div>
+    </div>
+    
+    <!-- 热销商品 TOP10 -->
+    <div class="mb-4">
+        <h6 style="color: #555; margin-bottom: 10px; font-weight: 600;">热销商品 TOP10</h6>
+        <div class="d-flex gap-2 mb-3">
+            <button class="btn-outline-custom active" onclick="changeHotProductsPeriod('day', event)">昨日</button>
+            <button class="btn-outline-custom" onclick="changeHotProductsPeriod('week', event)">本周</button>
+            <button class="btn-outline-custom" onclick="changeHotProductsPeriod('month', event)">本月</button>
+            <button class="btn-outline-custom" onclick="changeHotProductsPeriod('total', event)">累计</button>
+        </div>
+        <div id="hotProductsChart" style="height: 400px;"></div>
+    </div>
+</div>
+
+<!-- 商品分析 -->
+<div class="content-card mb-4">
+    <h5 style="color: #333; margin-bottom: 10px; font-weight: 600;">
+        <i class="bi bi-box-seam" style="margin-right: 8px; color: #667eea;"></i>
+        商品分析
+    </h5>
+    <div class="d-flex gap-2 mb-4">
+        <button class="btn-outline-custom active" onclick="changeProductPeriod('day', event)">昨日</button>
+        <button class="btn-outline-custom" onclick="changeProductPeriod('week', event)">本周</button>
+        <button class="btn-outline-custom" onclick="changeProductPeriod('month', event)">本月</button>
+        <button class="btn-outline-custom" onclick="changeProductPeriod('total', event)">累计</button>
+    </div>
+    
+    <div class="row g-4">
+        <div class="col-md-6">
+            <h6 style="color: #555; margin-bottom: 15px; font-weight: 600;">商品销量排行</h6>
+            <div id="salesRankChart" style="height: 350px;"></div>
+        </div>
+        <div class="col-md-6">
+            <h6 style="color: #555; margin-bottom: 15px; font-weight: 600;">毛利排行</h6>
+            <div id="profitRankChart" style="height: 350px;"></div>
+        </div>
+    </div>
+    
+    <!-- <div class="mt-4">
+        <h6 style="color: #555; margin-bottom: 15px; font-weight: 600;">库存周转率</h6>
+        <div id="stockTurnoverChart" style="height: 350px;"></div>
+    </div> -->
+</div>
+
+<!-- 会员分析 -->
+<div class="content-card mb-4">
+    <h5 style="color: #333; margin-bottom: 10px; font-weight: 600;">
+        <i class="bi bi-people" style="margin-right: 8px; color: #667eea;"></i>
+        会员分析
+    </h5>
+    <div class="d-flex gap-2 mb-4">
+        <button class="btn-outline-custom active" onclick="changeMemberPeriod('day', event)">昨日</button>
+        <button class="btn-outline-custom" onclick="changeMemberPeriod('week', event)">本周</button>
+        <button class="btn-outline-custom" onclick="changeMemberPeriod('month', event)">本月</button>
+        <button class="btn-outline-custom" onclick="changeMemberPeriod('total', event)">累计</button>
+    </div>
+    
+    <div class="row g-4">
+        <div class="col-md-4">
+            <h6 style="color: #555; margin-bottom: 15px; font-weight: 600;">会员消费占比</h6>
+            <div id="memberConsumptionChart" style="height: 350px;"></div>
+        </div>
+        <div class="col-md-8">
+            <h6 style="color: #555; margin-bottom: 15px; font-weight: 600;">新增会员数</h6>
+            <div id="newMembersChart" style="height: 350px;"></div>
+       
+        </div>
+    </div>
+       <div class="mt-4" id="chart_fg">
+        <h6 style="color: #555; margin-bottom: 15px; font-weight: 600;">会员复购率</h6>
+        <div id="repurchaseRateChart" style="height: 350px;"></div>
+    </div>
+
+</div>
+
+<!-- ECharts JS -->
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+<!-- SheetJS for Excel export -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+<script>
+// 显示暂无数据的图表
+function showEmptyChart(chart, title) {
+    var option = {
+        title: {
+            text: title,
+            left: 'center',
+            top: 'center',
+            textStyle: {
+                color: '#999',
+                fontSize: 16,
+                fontWeight: 'normal'
+            }
+        },
+        graphic: {
+            elements: [{
+                type: 'image',
+                style: {
+                    image: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNjY2MiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0zIDN2MThoMTgiLz48cGF0aCBkPSJNMTggMTdWOSIvPjxwYXRoIGQ9Ik0xMyAxN1Y1Ii8+PHBhdGggZD0iTTggMTd2LTMiLz48L3N2Zz4=',
+                    width: 64,
+                    height: 64
+                },
+                left: 'center',
+                top: '20%'
+            }]
+        }
+    };
+    chart.setOption(option);
+}
+
+$(document).ready(function() {
+    // 初始化所有图表
+    get_data_overview('day');
+    initHotProductsChart('day');
+    initTrendChart('day');
+    initSalesRankChart('day');
+    initProfitRankChart('day');
+    // initStockTurnoverChart('day');
+    initMemberConsumptionChart('day');
+    initNewMembersChart('day');
+    initRepurchaseRateChart('day');
+});
+
+// 热销商品 TOP10
+function initHotProductsChart(period = 'day') {
+    var chart = echarts.init(document.getElementById('hotProductsChart'));
+    
+    // 先清空图表
+    chart.clear();
+    
+    // 通过AJAX获取数据
+    $.ajax({
+        url: '/reports/api/hot-products/',
+        type: 'GET',
+        data: { period: period },
+        success: function(response) {
+            if (response.code === '1') {
+                var data = response.data;
+                
+                // 检查是否有数据
+                var hasData = data.product_names && data.product_names.length > 0 && data.quantities && data.quantities.some(function(val) { return val > 0; });
+                
+                if (!hasData) {
+                    showEmptyChart(chart, '暂无热销商品数据');
+                    return;
+                }
+                
+                var option = {
+                    tooltip: {
+                        trigger: 'axis',
+                        axisPointer: {
+                            type: 'shadow'
+                        }
+                    },
+                    grid: {
+                        left: '3%',
+                        right: '4%',
+                        bottom: '3%',
+                        containLabel: true
+                    },
+                    xAxis: {
+                        type: 'category',
+                        data: data.product_names,
+                        axisLabel: {
+                            rotate: 45,
+                            interval: 0
+                        }
+                    },
+                    yAxis: {
+                        type: 'value',
+                        name: '销量'
+                    },
+                    series: [{
+                        name: '销量',
+                        type: 'bar',
+                        data: data.quantities,
+                        itemStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                {offset: 0, color: '#667eea'},
+                                {offset: 1, color: '#764ba2'}
+                            ])
+                        }
+                    }]
+                };
+                
+                chart.setOption(option);
+            }
+        },
+        error: function() {
+            console.error('获取热销商品数据失败');
+        }
+    });
+    
+    // 响应式
+    window.addEventListener('resize', function() {
+        chart.resize();
+    });
+}
+
+// 切换热销商品周期
+function changeHotProductsPeriod(period, event) {
+    // 更新按钮状态
+    event.target.parentElement.querySelectorAll('.btn-outline-custom').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    
+    // 重新初始化图表
+    initHotProductsChart(period);
+}
+
+// 趋势分析图表
+function initTrendChart(period) {
+    var chart = echarts.init(document.getElementById('trendChart'));
+    
+    // 先清空图表
+    chart.clear();
+    
+    // 通过AJAX获取数据
+    $.ajax({
+        url: '/reports/api/trend/',
+        type: 'GET',
+        data: { period: period },
+        success: function(response) {
+            if (response.code === '1') {
+                var data = response.data;
+                
+                // 检查是否有数据
+                var hasData = (data.current_data && data.current_data.some(function(val) { return val > 0; })) ||
+                              (data.last_period_data && data.last_period_data.some(function(val) { return val > 0; }));
+                
+                if (!hasData) {
+                    showEmptyChart(chart, '暂无趋势数据');
+                    return;
+                }
+                
+                var option = {
+                    tooltip: {
+                        trigger: 'axis'
+                    },
+                    legend: {
+                        data: ['本期', '同期']
+                    },
+                    grid: {
+                        left: '3%',
+                        right: '4%',
+                        bottom: '3%',
+                        containLabel: true
+                    },
+                    xAxis: {
+                        type: 'category',
+                        boundaryGap: false,
+                        data: data.x_axis
+                    },
+                    yAxis: {
+                        type: 'value',
+                        name: '营业额 (元)'
+                    },
+                    series: [
+                        {
+                            name: '本期',
+                            type: 'line',
+                            data: data.current_data,
+                            smooth: true,
+                            itemStyle: {
+                                color: '#667eea'
+                            },
+                            areaStyle: {
+                                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                    {offset: 0, color: 'rgba(102, 126, 234, 0.3)'},
+                                    {offset: 1, color: 'rgba(102, 126, 234, 0.1)'}
+                                ])
+                            }
+                        },
+                        {
+                            name: '同期',
+                            type: 'line',
+                            data: data.last_period_data,
+                            smooth: true,
+                            itemStyle: {
+                                color: '#e74c3c'
+                            },
+                            areaStyle: {
+                                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                    {offset: 0, color: 'rgba(231, 76, 60, 0.3)'},
+                                    {offset: 1, color: 'rgba(231, 76, 60, 0.1)'}
+                                ])
+                            }
+                        }
+                    ]
+                };
+
+                
+                chart.setOption(option);
+            }
+        },
+        error: function() {
+            console.error('获取趋势分析数据失败');
+        }
+    });
+    
+    // 响应式
+    window.addEventListener('resize', function() {
+        chart.resize();
+    });
+}
+
+// 商品销量排行
+function initSalesRankChart(period = 'day') {
+    var chart = echarts.init(document.getElementById('salesRankChart'));
+    
+    // 先清空图表
+    chart.clear();
+    
+    // 通过AJAX获取数据
+    $.ajax({
+        url: '/reports/api/sales-rank/',
+        type: 'GET',
+        data: { period: period },
+        success: function(response) {
+            if (response.code === '1') {
+                var data = response.data;
+                
+                // 检查是否有数据
+                var hasData = data.categories && data.categories.length > 0 && data.quantities && data.quantities.some(function(val) { return val > 0; });
+                
+                if (!hasData) {
+                    showEmptyChart(chart, '暂无销量数据');
+                    return;
+                }
+                
+                var chartData = [];
+                for (let i = 0; i < data.categories.length; i++) {
+                    chartData.push({
+                        value: data.quantities[i],
+                        name: data.categories[i]
+                    });
+                }
+                
+                var option = {
+                    tooltip: {
+                        trigger: 'item'
+                    },
+                    legend: {
+                        orient: 'vertical',
+                        left: 'left'
+                    },
+                    series: [{
+                        name: '销量',
+                        type: 'pie',
+                        radius: '70%',
+                        data: chartData,
+                        emphasis: {
+                            itemStyle: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        }
+                    }]
+                };
+                
+                chart.setOption(option);
+            }
+        },
+        error: function() {
+            console.error('获取商品销量排行数据失败');
+        }
+    });
+    
+    // 响应式
+    window.addEventListener('resize', function() {
+        chart.resize();
+    });
+}
+
+// 毛利排行
+function initProfitRankChart(period = 'day') {
+    var chart = echarts.init(document.getElementById('profitRankChart'));
+    
+    // 先清空图表
+    chart.clear();
+    
+    // 通过AJAX获取数据
+    $.ajax({
+        url: '/reports/api/profit-rank/',
+        type: 'GET',
+        data: { period: period },
+        success: function(response) {
+            if (response.code === '1') {
+                var data = response.data;
+                
+                // 检查是否有数据
+                var hasData = data.categories && data.categories.length > 0 && data.profits && data.profits.some(function(val) { return val > 0; });
+                
+                if (!hasData) {
+                    showEmptyChart(chart, '暂无毛利数据');
+                    return;
+                }
+                
+                var chartData = [];
+                for (let i = 0; i < data.categories.length; i++) {
+                    chartData.push({
+                        value: data.profits[i],
+                        name: data.categories[i]
+                    });
+                }
+                
+                var option = {
+                    tooltip: {
+                        trigger: 'item'
+                    },
+                    legend: {
+                        orient: 'vertical',
+                        left: 'left'
+                    },
+                    series: [{
+                        name: '毛利',
+                        type: 'pie',
+                        radius: '70%',
+                        data: chartData,
+                        emphasis: {
+                            itemStyle: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        }
+                    }]
+                };
+                
+                chart.setOption(option);
+            }
+        },
+        error: function() {
+            console.error('获取毛利排行数据失败');
+        }
+    });
+    
+    // 响应式
+    window.addEventListener('resize', function() {
+        chart.resize();
+    });
+}
+
+// 库存周转率
+function initStockTurnoverChart(period = 'day') {
+    var chart = echarts.init(document.getElementById('stockTurnoverChart'));
+    
+    var data;
+    
+    if (period === 'day') {
+        data = [8.5, 6.2, 4.8, 3.5, 2.1];
+    } else if (period === 'week') {
+        data = [12.5, 9.8, 7.2, 5.6, 3.8];
+    } else if (period === 'month') {
+        data = [18.2, 14.5, 10.8, 8.2, 5.5];
+    } else if (period === 'total') {
+        data = [25.8, 20.5, 15.2, 12.8, 8.5];
+    }
+    
+    var option = {
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+                type: 'shadow'
+            }
+        },
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+        },
+        xAxis: {
+            type: 'category',
+            data: ['饮料类', '食品类', '日用品', '文具类', '其他']
+        },
+        yAxis: {
+            type: 'value',
+            name: '周转率'
+        },
+        series: [{
+            name: '周转率',
+            type: 'bar',
+            data: data,
+            itemStyle: {
+                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                    {offset: 0, color: '#4caf50'},
+                    {offset: 1, color: '#81c784'}
+                ])
+            }
+        }]
+    };
+    
+    chart.setOption(option);
+    
+    // 响应式
+    window.addEventListener('resize', function() {
+        chart.resize();
+    });
+}
+
+// 切换商品分析周期
+function changeProductPeriod(period, event) {
+    // 更新按钮状态
+    event.target.parentElement.querySelectorAll('.btn-outline-custom').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    
+    // 重新初始化图表
+    initSalesRankChart(period);
+    initProfitRankChart(period);
+    initStockTurnoverChart(period);
+}
+
+// 会员消费占比
+function initMemberConsumptionChart(period = 'day') {
+    var chart = echarts.init(document.getElementById('memberConsumptionChart'));
+    
+    // 先清空图表
+    chart.clear();
+    
+    // 通过AJAX获取数据
+    $.ajax({
+        url: '/reports/api/member-consumption/',
+        type: 'GET',
+        data: { period: period },
+        success: function(response) {
+            if (response.code === '1') {
+                var data = response.data;
+                
+                // 检查是否有数据
+                var hasData = (data.member_orders && data.member_orders > 0) || (data.non_member_orders && data.non_member_orders > 0);
+                
+                if (!hasData) {
+                    showEmptyChart(chart, '暂无消费数据');
+                    return;
+                }
+                
+                var option = {
+                    tooltip: {
+                        trigger: 'item'
+                    },
+                    legend: {
+                        orient: 'vertical',
+                        left: 'left'
+                    },
+                    series: [{
+                        name: '消费占比',
+                        type: 'pie',
+                        radius: '70%',
+                        data: [
+                            {value: data.member_orders, name: '会员消费'},
+                            {value: data.non_member_orders, name: '非会员消费'}
+                        ],
+                        emphasis: {
+                            itemStyle: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        }
+                    }]
+                };
+                
+                chart.setOption(option);
+            }
+        },
+        error: function() {
+            console.error('获取会员消费占比数据失败');
+        }
+    });
+    
+    // 响应式
+    window.addEventListener('resize', function() {
+        chart.resize();
+    });
+}
+
+// 新增会员数
+function initNewMembersChart(period = 'day') {
+    var chart = echarts.init(document.getElementById('newMembersChart'));
+    
+    // 先清空图表
+    chart.clear();
+    
+    // 通过AJAX获取数据
+    $.ajax({
+        url: '/reports/api/new-members/',
+        type: 'GET',
+        data: { period: period },
+        success: function(response) {
+            if (response.code === '1') {
+                var data = response.data;
+                
+                // 检查是否有数据
+                var hasData = data.new_members && data.new_members.some(function(val) { return val > 0; });
+                
+                if (!hasData) {
+                    showEmptyChart(chart, '暂无新增会员数据');
+                    return;
+                }
+                
+                var option = {
+                    tooltip: {
+                        trigger: 'axis'
+                    },
+                    grid: {
+                        left: '6%',
+                        right: '4%',
+                        bottom: '3%',
+                        containLabel: true
+                    },
+                    xAxis: {
+                        type: 'category',
+                        data: data.x_axis
+                    },
+                    yAxis: {
+                        type: 'value',
+                        name: '新增会员数'
+                    },
+                    series: [{
+                        name: '新增会员',
+                        type: 'bar',
+                        data: data.new_members,
+                        barWidth: '40%', // 调整柱状图粗细
+                        itemStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                {offset: 0, color: '#ff9800'},
+                                {offset: 1, color: '#ffb74d'}
+                            ])
+                        }
+                    }]
+                };
+                
+                chart.setOption(option);
+            }
+        },
+        error: function() {
+            console.error('获取新增会员数数据失败');
+        }
+    });
+    
+    // 响应式
+    window.addEventListener('resize', function() {
+        chart.resize();
+    });
+}
+
+// 会员复购率
+function initRepurchaseRateChart(period = 'day') {
+    var chart = echarts.init(document.getElementById('repurchaseRateChart'));
+    
+    // 先清空图表
+    chart.clear();
+    
+    // 通过AJAX获取数据
+    $.ajax({
+        url: '/reports/api/repurchase-rate/',
+        type: 'GET',
+        data: { period: period },
+        success: function(response) {
+            if (response.code === '1') {
+                var data = response.data;
+                
+                // 检查是否有数据
+                var hasData = data.repurchase_rate && data.repurchase_rate.some(function(val) { return val > 0; });
+                
+                if (!hasData) {
+                    showEmptyChart(chart, '暂无复购率数据');
+                    return;
+                }
+                
+                var option = {
+                    tooltip: {
+                        trigger: 'axis'
+                    },
+                    grid: {
+                        left: '3%',
+                        right: '4%',
+                        bottom: '3%',
+                        containLabel: true
+                    },
+                    xAxis: {
+                        type: 'category',
+                        boundaryGap: false,
+                        data: data.x_axis
+                    },
+                    yAxis: {
+                        type: 'value',
+                        name: '复购率 (%)',
+                        axisLabel: {
+                            formatter: '{value}%'
+                        }
+                    },
+                    series: [{
+                        name: '复购率',
+                        type: 'line',
+                        data: data.repurchase_rate,
+                        smooth: true,
+                        itemStyle: {
+                            color: '#9c27b0'
+                        },
+                        areaStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                {offset: 0, color: 'rgba(156, 39, 176, 0.3)'},
+                                {offset: 1, color: 'rgba(156, 39, 176, 0.1)'}
+                            ])
+                        }
+                    }]
+                };
+                
+                chart.setOption(option);
+            }
+        },
+        error: function() {
+            console.error('获取会员复购率数据失败');
+        }
+    });
+    
+    // 响应式
+    window.addEventListener('resize', function() {
+        chart.resize();
+    });
+}
+
+// 切换会员分析周期
+function changeMemberPeriod(period, event) {
+    // 更新按钮状态
+    event.target.parentElement.querySelectorAll('.btn-outline-custom').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    
+    // 重新初始化图表
+    initMemberConsumptionChart(period);
+    initNewMembersChart(period);
+    initRepurchaseRateChart(period);
+}
+
+// 切换统计周期
+function changePeriod(period, event) {
+ 
+    
+    get_data_overview(period);
+    // 更新趋势分析图表
+    initTrendChart(period);
+
+       // 更新按钮状态
+    event.target.parentElement.querySelectorAll('.btn-outline-custom').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+
+        // 更新经营概览标签
+    document.getElementById('salesLabel').textContent = period === 'day' ? '今日营业额' : 
+                                                      period === 'week' ? '本周营业额' : 
+                                                      period === 'month' ? '本月营业额' : '累计营业额';
+    document.getElementById('ordersLabel').textContent = period === 'day' ? '今日订单数' : 
+                                                      period === 'week' ? '本周订单数' : 
+                                                      period === 'month' ? '本月订单数' : '累计订单数';
+    document.getElementById('customersLabel').textContent = period === 'day' ? '今日顾客数' : 
+                                                        period === 'week' ? '本周顾客数' : 
+                                                        period === 'month' ? '本月顾客数' : '累计顾客数';
+                                                        
+}
+
+function get_data_overview(period){
+      // 通过AJAX获取经营概览数据
+    $.ajax({
+        url: '/reports/api/overview/',
+        type: 'GET',
+        data: { period: period },
+        success: function(response) {
+            if (response.code === '1') {
+                var data = response.data;
+                var salesElement = document.querySelector('#salesLabel').parentElement.querySelector('h3');
+                var ordersElement = document.querySelector('#ordersLabel').parentElement.querySelector('h3');
+                var customersElement = document.querySelector('#customersLabel').parentElement.querySelector('h3');
+                var grossMarginElement = document.querySelector('#grossMarginLabel').parentElement.querySelector('h3');
+                
+                // 格式化数据
+                salesElement.textContent = '¥' + data.sales.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                ordersElement.textContent = data.orders.toLocaleString('zh-CN');
+                customersElement.textContent = data.customers.toLocaleString('zh-CN');
+                grossMarginElement.textContent = data.gross_margin.toFixed(1) + '%';
+            }
+        },
+        error: function() {
+            console.error('获取经营概览数据失败');
+        }
+    });
+}
+
+
+// 导出报表
+function exportReport(type) {
+    if (type === 'print') {
+        // 添加打印前的准备
+        addPrintStyles();
+        
+        // 延迟打印以确保样式生效
+        setTimeout(() => {
+            window.print();
+            // 打印完成后恢复样式
+            setTimeout(removePrintStyles, 100);
+        }, 200);
+    } else if (type === 'excel') {
+        exportToExcel();
+    }
+}
+
+// 导出Excel功能
+function exportToExcel() {
+    // 获取当前选中的报表类型
+    var reportType = $('#reportType').val();
+    var reportTypeName = $('#reportType option:selected').text();
+    
+    // 创建Excel工作簿
+    var wb = XLSX.utils.book_new();
+    
+    // 获取当前日期
+    var now = new Date();
+    var dateStr = now.getFullYear() + 
+                  String(now.getMonth() + 1).padStart(2, '0') + 
+                  String(now.getDate()).padStart(2, '0');
+    
+    // 并行获取所有数据
+    Promise.all([
+        fetchOverviewData(reportType),
+        fetchTrendData(reportType),
+        fetchSalesRankData(reportType),
+        fetchProfitRankData(reportType),
+        fetchNewMembersData(reportType)
+    ]).then(function(results) {
+        // 创建各个Sheet
+        createOverviewSheet(wb, results[0], reportTypeName);
+        createTrendSheet(wb, results[1], reportTypeName);
+        createSalesRankSheet(wb, results[2], reportTypeName);
+        createProfitRankSheet(wb, results[3], reportTypeName);
+        createNewMembersSheet(wb, results[4], reportTypeName);
+        
+        // 生成文件名
+        var fileName = reportTypeName + '_' + dateStr + '.xlsx';
+        
+        // 下载Excel文件
+        XLSX.writeFile(wb, fileName);
+        
+        showAlert('success', 'Excel导出成功！');
+    }).catch(function(error) {
+        console.error('导出失败:', error);
+        showAlert('error', '导出失败：' + error.message);
+    });
+}
+
+// 获取经营概览数据
+function fetchOverviewData(reportType) {
+    return new Promise(function(resolve, reject) {
+        $.ajax({
+            url: '/reports/api/overview/',
+            type: 'GET',
+            data: { period: reportType === 'day' ? 'day' : reportType },
+            success: function(response) {
+                if (response.code === '1') {
+                    resolve(response.data);
+                } else {
+                    reject(new Error('获取经营概览数据失败'));
+                }
+            },
+            error: function() {
+                reject(new Error('获取经营概览数据失败'));
+            }
+        });
+    });
+}
+
+// 获取趋势分析数据
+function fetchTrendData(reportType) {
+    return new Promise(function(resolve, reject) {
+        $.ajax({
+            url: '/reports/api/trend/',
+            type: 'GET',
+            data: { period: reportType === 'day' ? 'day' : reportType },
+            success: function(response) {
+                if (response.code === '1') {
+                    resolve(response.data);
+                } else {
+                    reject(new Error('获取趋势分析数据失败'));
+                }
+            },
+            error: function() {
+                reject(new Error('获取趋势分析数据失败'));
+            }
+        });
+    });
+}
+
+// 获取商品销量排行数据
+function fetchSalesRankData(reportType) {
+    return new Promise(function(resolve, reject) {
+        $.ajax({
+            url: '/reports/api/sales-rank/',
+            type: 'GET',
+            data: { period: reportType === 'day' ? 'day' : reportType },
+            success: function(response) {
+                if (response.code === '1') {
+                    resolve(response.data);
+                } else {
+                    reject(new Error('获取商品销量排行数据失败'));
+                }
+            },
+            error: function() {
+                reject(new Error('获取商品销量排行数据失败'));
+            }
+        });
+    });
+}
+
+// 获取毛利排行数据
+function fetchProfitRankData(reportType) {
+    return new Promise(function(resolve, reject) {
+        $.ajax({
+            url: '/reports/api/profit-rank/',
+            type: 'GET',
+            data: { period: reportType === 'day' ? 'day' : reportType },
+            success: function(response) {
+                if (response.code === '1') {
+                    resolve(response.data);
+                } else {
+                    reject(new Error('获取毛利排行数据失败'));
+                }
+            },
+            error: function() {
+                reject(new Error('获取毛利排行数据失败'));
+            }
+        });
+    });
+}
+
+// 获取新增会员数数据
+function fetchNewMembersData(reportType) {
+    return new Promise(function(resolve, reject) {
+        $.ajax({
+            url: '/reports/api/new-members/',
+            type: 'GET',
+            data: { period: reportType === 'day' ? 'day' : reportType },
+            success: function(response) {
+                if (response.code === '1') {
+                    resolve(response.data);
+                } else {
+                    reject(new Error('获取新增会员数数据失败'));
+                }
+            },
+            error: function() {
+                reject(new Error('获取新增会员数数据失败'));
+            }
+        });
+    });
+}
+
+// 创建经营概览Sheet
+function createOverviewSheet(wb, data, reportTypeName) {
+    var wsData = [
+        ['经营概览'],
+        [],
+        ['指标', '数值'],
+        ['营业额', '¥' + data.sales.toFixed(2)],
+        ['订单数', data.orders],
+        ['顾客数', data.customers],
+        ['毛利率', data.gross_margin + '%']
+    ];
+    
+    var ws = XLSX.utils.aoa_to_sheet(wsData);
+    
+    // 设置表头样式
+    ws['A1'].s = { font: { bold: true, sz: 14 } };
+    ws['A3'].s = { font: { bold: true } };
+    ws['B3'].s = { font: { bold: true } };
+    
+    // 设置列宽
+    ws['!cols'] = [{ wch: 15 }, { wch: 20 }];
+    
+    XLSX.utils.book_append_sheet(wb, ws, '经营概览');
+}
+
+// 创建趋势分析Sheet
+function createTrendSheet(wb, data, reportTypeName) {
+    var wsData = [['趋势分析'], [], ['时间', '本期营业额', '同期营业额']];
+    
+    for (var i = 0; i < data.x_axis.length; i++) {
+        wsData.push([
+            data.x_axis[i],
+            data.current_data[i],
+            data.last_period_data[i]
+        ]);
+    }
+    
+    var ws = XLSX.utils.aoa_to_sheet(wsData);
+    
+    // 设置表头样式
+    ws['A1'].s = { font: { bold: true, sz: 14 } };
+    ws['A3'].s = { font: { bold: true } };
+    ws['B3'].s = { font: { bold: true } };
+    ws['C3'].s = { font: { bold: true } };
+    
+    // 设置列宽
+    ws['!cols'] = [{ wch: 15 }, { wch: 15 }, { wch: 15 }];
+    
+    XLSX.utils.book_append_sheet(wb, ws, '趋势分析');
+}
+
+// 创建商品销量排行Sheet
+function createSalesRankSheet(wb, data, reportTypeName) {
+    var wsData = [['商品销量排行'], [], ['分类名称', '销量']];
+    
+    for (var i = 0; i < data.categories.length; i++) {
+        wsData.push([data.categories[i], data.quantities[i]]);
+    }
+    
+    var ws = XLSX.utils.aoa_to_sheet(wsData);
+    
+    // 设置表头样式
+    ws['A1'].s = { font: { bold: true, sz: 14 } };
+    ws['A3'].s = { font: { bold: true } };
+    ws['B3'].s = { font: { bold: true } };
+    
+    // 设置列宽
+    ws['!cols'] = [{ wch: 20 }, { wch: 15 }];
+    
+    XLSX.utils.book_append_sheet(wb, ws, '商品销量排行');
+}
+
+// 创建毛利排行Sheet
+function createProfitRankSheet(wb, data, reportTypeName) {
+    var wsData = [['毛利排行'], [], ['分类名称', '毛利']];
+    
+    for (var i = 0; i < data.categories.length; i++) {
+        wsData.push([data.categories[i], data.profits[i]]);
+    }
+    
+    var ws = XLSX.utils.aoa_to_sheet(wsData);
+    
+    // 设置表头样式
+    ws['A1'].s = { font: { bold: true, sz: 14 } };
+    ws['A3'].s = { font: { bold: true } };
+    ws['B3'].s = { font: { bold: true } };
+    
+    // 设置列宽
+    ws['!cols'] = [{ wch: 20 }, { wch: 15 }];
+    
+    XLSX.utils.book_append_sheet(wb, ws, '毛利排行');
+}
+
+// 创建新增会员数Sheet
+function createNewMembersSheet(wb, data, reportTypeName) {
+    var wsData = [['新增会员数'], [], ['时间', '新增会员数']];
+    
+    for (var i = 0; i < data.x_axis.length; i++) {
+        wsData.push([data.x_axis[i], data.new_members[i]]);
+    }
+    
+    var ws = XLSX.utils.aoa_to_sheet(wsData);
+    
+    // 设置表头样式
+    ws['A1'].s = { font: { bold: true, sz: 14 } };
+    ws['A3'].s = { font: { bold: true } };
+    ws['B3'].s = { font: { bold: true } };
+    
+    // 设置列宽
+    ws['!cols'] = [{ wch: 15 }, { wch: 15 }];
+    
+    XLSX.utils.book_append_sheet(wb, ws, '新增会员数');
+}
+
+// 显示提示信息
+function showAlert(type, message) {
+    // 创建提示元素
+    var alertDiv = document.createElement('div');
+    alertDiv.style.cssText = 'position: fixed; top: 20px; right: 20px; padding: 15px 20px; border-radius: 8px; z-index: 9999; font-size: 14px; color: white;';
+    
+    if (type === 'success') {
+        alertDiv.style.backgroundColor = '#27ae60';
+    } else {
+        alertDiv.style.backgroundColor = '#e74c3c';
+    }
+    
+    alertDiv.textContent = message;
+    document.body.appendChild(alertDiv);
+    
+    // 3秒后自动移除
+    setTimeout(function() {
+        alertDiv.remove();
+    }, 3000);
+}
+
+// 添加打印样式
+function addPrintStyles() {
+    // 添加打印水印
+    const printStyle = document.createElement('style');
+
+    printStyle.id = 'print-styles';
+    printStyle.innerHTML = `
+        @media print {
+            /* 打印页眉 */
+     
+            
+            /* 打印页脚 */
+            @page :footer {
+                display: none;
+            }
+            
+            @page :header {
+                display: none;
+            }
+            
+            /* 强制分页 */
+            .page-break {
+                page-break-after: always;
+            }
+            
+            /* 优化图表打印 */
+            .echarts {
+                width: 100% !important;
+                height: auto !important;
+            }
+
+           
+        }
+
+         #chart_fg{
+                margin-top: 300px !important;
+            }
+    `;
+    document.head.appendChild(printStyle);
+}
+
+// 移除打印样式
+function removePrintStyles() {
+    const printStyle = document.getElementById('print-styles');
+
+    if (printStyle) {
+        printStyle.remove();
+    }
+}
+</script>

@@ -1,0 +1,572 @@
+<!-- 页面标题 -->
+<div class="page-header">
+    <h1 class="page-title">订单管理</h1>
+</div>
+
+<!-- 内容区域 -->
+<div class="card">
+    <div class="card-body">
+        <!-- 筛选和搜索区域 -->
+        <div class="filter-section">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>订单号：</label>
+                    <input type="text" id="orderNoFilter" class="form-control" placeholder="输入订单号" value="{{ order_no }}">
+                </div>
+                <div class="filter-item">
+                    <label>订单状态：</label>
+                    <select id="statusFilter" class="form-select">
+                        <option value="">全部</option>
+                        <option value="paid" {% if status_filter == 'paid' %}selected{% endif %}>已支付</option>
+                        <option value="refunded" {% if status_filter == 'refunded' %}selected{% endif %}>已退款</option>
+                        <option value="canceled" {% if status_filter == 'canceled' %}selected{% endif %}>已取消</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>支付方式：</label>
+                    <select id="paymentFilter" class="form-select">
+                        <option value="">全部</option>
+                        <option value="cash" {% if payment_method_filter == 'cash' %}selected{% endif %}>现金</option>
+                        <option value="wechat" {% if payment_method_filter == 'wechat' %}selected{% endif %}>微信</option>
+                        <option value="alipay" {% if payment_method_filter == 'alipay' %}selected{% endif %}>支付宝</option>
+                        <option value="member" {% if payment_method_filter == 'member' %}selected{% endif %}>会员卡</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>收银员：</label>
+                    <input type="text" id="cashierFilter" class="form-control" placeholder="输入收银员名称" value="{{ cashier_search }}">
+                </div>
+                <div class="filter-item">
+                    <label>会员手机：</label>
+                    <input type="text" id="memberPhoneFilter" class="form-control" placeholder="输入手机号" value="{{ member_phone }}">
+                </div>
+                <div class="filter-item">
+                    <label>商品名称：</label>
+                    <input type="text" id="productNameFilter" class="form-control" placeholder="输入商品名称" value="{{ product_name }}">
+                </div>
+            </div>
+            <div class="filter-row" style="margin-top: 12px;">
+                <div class="filter-item">
+                    <label>下单时间：</label>
+                    <div class="date-range" style="display: flex; align-items: center; gap: 8px;">
+                        <input type="date" id="startDate" class="form-control" value="{{ start_date }}">
+                        <span>至</span>
+                        <input type="date" id="endDate" class="form-control" value="{{ end_date }}">
+                    </div>
+                </div>
+                <div class="filter-item">
+                    <button id="searchBtn" class="btn-primary">
+                        <i class="bi bi-search"></i>
+                        搜索
+                    </button>
+                    <button id="resetBtn" class="btn-secondary">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                        重置
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 订单列表 -->
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th style="width: 50px;"></th>
+                        <th>订单号</th>
+                        <th>下单时间</th>
+                        <th>收银员</th>
+                        <th>会员</th>
+                        <th>订单总额</th>
+                        <th>实收金额</th>
+                        <th>支付方式</th>
+                        <th>状态</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr class="order-row" data-order-id="{{ order.id }}">
+                        <td>
+                            <button class="btn-expand" onclick="toggleOrderItems({{ order.id }})">
+                                <i class="bi bi-chevron-right" id="icon-{{ order.id }}"></i>
+                            </button>
+                        </td>
+                        <td>{{ order.order_no }}</td>
+                        <td>{{ order.create_time|date:'Y-m-d H:i:s' }}</td>
+                        <td>{{ order.cashier.username }} (ID: {{ order.cashier.id }})</td>
+                        <td>
+                            {% if order.member %}
+                                {{ order.member.name }} ({{ order.member.phone }})
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td>¥{{ order.total_amount }}</td>
+                        <td>¥{{ order.paid_amount }}</td>
+                        <td>{{ order.get_payment_method_display }}</td>
+                        <td>
+                            <span class="badge {% if order.status == 'paid' %}bg-success{% elif order.status == 'refunded' %}bg-warning{% else %}bg-secondary{% endif %}">
+                                {{ order.get_status_display }}
+                            </span>
+                        </td>
+                    </tr>
+                    <tr class="order-items-row" id="items-{{ order.id }}" style="display: none;">
+                        <td colspan="9" class="order-items-cell">
+                            <div class="order-items-content">
+                                <h4>订单明细</h4>
+                                <table class="table table-sm items-table">
+                                    <thead>
+                                        <tr>
+                                            <th>产品名称</th>
+                                            <th>数量</th>
+                                            <th>成交单价</th>
+                                            <th>小计</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for item in order.items.all %}
+                                        <tr>
+                                            <td>{{ item.product.name }} (ID: {{ item.product.id }})</td>
+                                            <td>{{ item.quantity }}</td>
+                                            <td>¥{{ item.price }}</td>
+                                            <td>¥{{ item.subtotal }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" class="text-center">
+                            <div class="empty-state">
+                                <i class="bi bi-receipt"></i>
+                                <h3>暂无订单数据</h3>
+                                <p>暂无符合条件的订单记录</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 分页 -->
+        {% if orders.paginator.num_pages > 1 %}
+        <div class="pagination-container">
+            <nav>
+                <ul class="pagination">
+                    {% if orders.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="javascript:void(0)" onclick="goToPage(1)">首页</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="javascript:void(0)" onclick="goToPage({{ orders.previous_page_number }})">上一页</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">首页</span>
+                        </li>
+                        <li class="page-item disabled">
+                            <span class="page-link">上一页</span>
+                        </li>
+                    {% endif %}
+
+                    {% for num in orders.paginator.page_range %}
+                        {% if num == orders.number %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                        {% elif num > orders.number|add:'-3' and num < orders.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="javascript:void(0)" onclick="goToPage({{ num }})">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if orders.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="javascript:void(0)" onclick="goToPage({{ orders.next_page_number }})">下一页</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="javascript:void(0)" onclick="goToPage({{ orders.paginator.num_pages }})">末页</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">下一页</span>
+                        </li>
+                        <li class="page-item disabled">
+                            <span class="page-link">末页</span>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            <div class="page-info">
+                第 {{ orders.number }} 页 / 共 {{ orders.paginator.num_pages }} 页
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.filter-section {
+    background: #f0f7ff;
+    padding: 16px 20px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    border: 1px solid #d6e8ff;
+}
+
+.filter-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.filter-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filter-item label {
+    font-weight: 500;
+    color: #4a6fa5;
+    white-space: nowrap;
+    font-size: 14px;
+}
+
+.filter-item .form-select,
+.filter-item .form-control {
+    min-width: 140px;
+    padding: 6px 12px;
+    border: 1px solid #b8d4f0;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.filter-item .form-select:focus,
+.filter-item .form-control:focus {
+    border-color: #4a90e2;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.15);
+}
+
+.btn-primary,
+.btn-secondary {
+    padding: 6px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 14px;
+}
+
+.btn-primary {
+    background: #4a90e2;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #357abd;
+}
+
+.btn-secondary {
+    background: #e8f1f8;
+    color: #4a6fa5;
+    border: 1px solid #b8d4f0;
+}
+
+.btn-secondary:hover {
+    background: #d6e8ff;
+}
+
+.table {
+    margin-bottom: 0;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.table th {
+    background: #e8f4fc;
+    color: #2c5aa0;
+    font-weight: 600;
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 2px solid #b8d4f0;
+    font-size: 14px;
+}
+
+.table td {
+    vertical-align: middle;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e8f1f8;
+    font-size: 14px;
+    color: #333;
+}
+
+.table tbody tr:hover {
+    background: #f5faff;
+}
+
+.table tbody tr:nth-child(even) {
+    background: #fafcfe;
+}
+
+.table tbody tr:nth-child(even):hover {
+    background: #f0f7ff;
+}
+
+.btn-expand {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    color: #4a90e2;
+    transition: transform 0.2s;
+}
+
+.btn-expand:hover {
+    color: #357abd;
+}
+
+.btn-expand.expanded i {
+    transform: rotate(90deg);
+    display: inline-block;
+    transition: transform 0.2s ease-in-out;
+}
+
+.btn-expand i {
+    display: inline-block;
+    transition: transform 0.2s ease-in-out;
+}
+
+.order-items-row {
+    background: #f8fbff !important;
+}
+
+.order-items-cell {
+    padding: 0 !important;
+}
+
+.order-items-content {
+    padding: 20px;
+    background: #f0f7ff;
+    border-left: 3px solid #4a90e2;
+}
+
+.order-items-content h4 {
+    margin: 0 0 15px 0;
+    color: #2c5aa0;
+    font-size: 16px;
+}
+
+.items-table {
+    background: white;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.items-table th {
+    background: #e8f4fc;
+    color: #2c5aa0;
+    font-weight: 600;
+    padding: 10px 15px;
+    font-size: 13px;
+}
+
+.items-table td {
+    padding: 10px 15px;
+    font-size: 13px;
+    border-bottom: 1px solid #e8f1f8;
+}
+
+.badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.bg-success {
+    background: #e8f5e8;
+  
+}
+
+.bg-warning {
+    background: #fff3e0;
+
+}
+
+.bg-secondary {
+    background: #f5f5f5;
+  
+}
+
+.text-muted {
+    color: #9ab;
+}
+
+.pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #e8f1f8;
+}
+
+.pagination {
+    margin: 0;
+}
+
+.page-item .page-link {
+    color: #4a90e2;
+    border: 1px solid #d6e8ff;
+    padding: 6px 12px;
+}
+
+.page-item.active .page-link {
+    background: #4a90e2;
+    border-color: #4a90e2;
+    color: white;
+}
+
+.page-item.disabled .page-link {
+    color: #b8d4f0;
+    border-color: #e8f1f8;
+}
+
+.page-info {
+    color: #6b8cae;
+    font-size: 13px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #8fa8c8;
+}
+
+.empty-state i {
+    font-size: 48px;
+    margin-bottom: 16px;
+    display: block;
+    color: #b8d4f0;
+}
+
+.empty-state h3 {
+    font-size: 16px;
+    margin-bottom: 8px;
+    color: #6b8cae;
+    font-weight: 500;
+}
+
+.empty-state p {
+    font-size: 13px;
+    color: #9ab;
+}
+</style>
+
+<script>
+$(document).ready(function() {
+    // 搜索按钮点击事件
+    $('#searchBtn').click(function() {
+        searchOrders();
+    });
+    
+    // 重置按钮点击事件
+    $('#resetBtn').click(function() {
+        $('#orderNoFilter').val('');
+        $('#statusFilter').val('');
+        $('#paymentFilter').val('');
+        $('#cashierFilter').val('');
+        $('#memberPhoneFilter').val('');
+        $('#productNameFilter').val('');
+        $('#startDate').val('');
+        $('#endDate').val('');
+        
+        loadPage('{% url "sales:order_list" %}');
+    });
+    
+    // 回车键搜索
+    $('#orderNoFilter, #cashierFilter, #memberPhoneFilter, #productNameFilter').keypress(function(e) {
+        if (e.which == 13) {
+            searchOrders();
+        }
+    });
+    
+    function searchOrders() {
+        var orderNo = $('#orderNoFilter').val();
+        var status = $('#statusFilter').val();
+        var payment = $('#paymentFilter').val();
+        var cashier = $('#cashierFilter').val();
+        var memberPhone = $('#memberPhoneFilter').val();
+        var productName = $('#productNameFilter').val();
+        var startDate = $('#startDate').val();
+        var endDate = $('#endDate').val();
+        
+        var url = '{% url "sales:order_list" %}?';
+        if (orderNo) url += 'order_no=' + encodeURIComponent(orderNo) + '&';
+        if (status) url += 'status=' + status + '&';
+        if (payment) url += 'payment_method=' + payment + '&';
+        if (cashier) url += 'cashier=' + encodeURIComponent(cashier) + '&';
+        if (memberPhone) url += 'member_phone=' + encodeURIComponent(memberPhone) + '&';
+        if (productName) url += 'product_name=' + encodeURIComponent(productName) + '&';
+        if (startDate) url += 'start_date=' + startDate + '&';
+        if (endDate) url += 'end_date=' + endDate + '&';
+        
+        // 移除末尾的&符号
+        url = url.replace(/&$/, '');
+        
+        loadPage(url);
+    }
+});
+
+// 切换订单明细展开/收起
+function toggleOrderItems(orderId) {
+    var itemsRow = $('#items-' + orderId);
+    var icon = $('#icon-' + orderId);
+    var btn = icon.closest('.btn-expand');
+    
+    if (itemsRow.is(':visible')) {
+        itemsRow.hide();
+        btn.removeClass('expanded');
+    } else {
+        itemsRow.show();
+        btn.addClass('expanded');
+    }
+}
+
+// 分页跳转函数
+function goToPage(pageNum) {
+    var orderNo = $('#orderNoFilter').val();
+    var status = $('#statusFilter').val();
+    var payment = $('#paymentFilter').val();
+    var cashier = $('#cashierFilter').val();
+    var memberPhone = $('#memberPhoneFilter').val();
+    var productName = $('#productNameFilter').val();
+    var startDate = $('#startDate').val();
+    var endDate = $('#endDate').val();
+    
+    var url = '{% url "sales:order_list" %}?page=' + pageNum;
+    if (orderNo) url += '&order_no=' + encodeURIComponent(orderNo);
+    if (status) url += '&status=' + status;
+    if (payment) url += '&payment_method=' + payment;
+    if (cashier) url += '&cashier=' + encodeURIComponent(cashier);
+    if (memberPhone) url += '&member_phone=' + encodeURIComponent(memberPhone);
+    if (productName) url += '&product_name=' + encodeURIComponent(productName);
+    if (startDate) url += '&start_date=' + startDate;
+    if (endDate) url += '&end_date=' + endDate;
+    
+    loadPage(url);
+}
+
+// 更新菜单激活状态
+{% if active_menu %}
+window.pendingMenuUpdate = '{{ active_menu }}';
+{% endif %}
+</script>

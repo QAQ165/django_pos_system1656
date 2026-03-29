@@ -1,0 +1,1573 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>收银台 - 零售店POS系统</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Vue 2 -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    
+    <style>
+        /* 收银台页面样式 */
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            background-color: #f5f6fa;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        /* 顶部栏 */
+        .top-bar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .top-bar h1 {
+            margin: 0;
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+        
+        .top-bar h1 i {
+            margin-right: 10px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .user-info span {
+            font-size: 14px;
+        }
+        
+        .btn-logout {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .btn-logout:hover {
+            background: rgba(255,255,255,0.3);
+            color: white;
+        }
+        
+        .btn-back-admin {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.3s;
+            margin-right: 10px;
+        }
+        
+        .btn-back-admin:hover {
+            background: rgba(255,255,255,0.3);
+            color: white;
+        }
+        
+        /* 主区域 */
+        .pos-container {
+            display: flex;
+            height: calc(100vh - 70px);
+            padding: 20px;
+            gap: 20px;
+        }
+        
+        /* 左侧商品区域 */
+        .products-section {
+            flex: 1;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        /* Tab导航 */
+        .tab-nav {
+            display: flex;
+            border-bottom: 1px solid #eee;
+            background: #f8f9fa;
+        }
+        
+        .tab-nav button {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            background: none;
+            font-size: 14px;
+            font-weight: 500;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .tab-nav button.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            background: white;
+        }
+        
+        .tab-nav button:hover {
+            color: #667eea;
+            background: #f0f0f0;
+        }
+        
+        .tab-nav button i {
+            margin-right: 8px;
+        }
+        
+        /* 搜索栏 */
+        .search-bar {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            background: white;
+        }
+        
+        .search-bar .input-group {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .search-bar input {
+            border: none;
+            padding: 15px 20px;
+            font-size: 16px;
+        }
+        
+        .search-bar input:focus {
+            box-shadow: none;
+        }
+        
+        .search-bar button {
+            border: none;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0 25px;
+        }
+        
+        /* 商品列表区域 */
+        .products-area {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .empty-state {
+            text-align: center;
+            color: #999;
+            padding: 40px 20px;
+        }
+        
+        .empty-state i {
+            font-size: 50px;
+            margin-bottom: 15px;
+            opacity: 0.3;
+        }
+        
+        /* 商品表格 */
+        .product-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .product-table th {
+            background: #f8f9fa;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #eee;
+            font-size: 14px;
+        }
+        
+        .product-table td {
+            padding: 12px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+            vertical-align: middle;
+        }
+        
+        .product-table img {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+        
+        .product-table .quantity-input {
+            width: 60px;
+            text-align: center;
+        }
+        
+        .product-table .btn-add, .product-table .btn-remove {
+            padding: 4px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .product-table .btn-add {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+        
+        .product-table .btn-add:hover {
+            background: #c8e6c9;
+        }
+        
+        .product-table .btn-remove {
+            background: #ffebee;
+            color: #d32f2f;
+        }
+        
+        .product-table .btn-remove:hover {
+            background: #ffcdd2;
+        }
+        
+        /* 分页 */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .pagination button {
+            padding: 6px 12px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .pagination button:hover {
+            background: #f0f0f0;
+        }
+        
+        .pagination button.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        /* 右侧购物车区域 */
+        .cart-section {
+            width: 400px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .cart-header {
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .cart-header h3 {
+            margin: 0;
+            font-size: 1.1rem;
+        }
+        
+        .cart-header h3 i {
+            margin-right: 8px;
+        }
+        
+        .cart-items {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .empty-cart {
+            text-align: center;
+            color: #999;
+            padding: 40px 20px;
+        }
+        
+        .empty-cart i {
+            font-size: 50px;
+            margin-bottom: 15px;
+            opacity: 0.3;
+        }
+        
+        /* 购物车商品 */
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .cart-item-info {
+            flex: 1;
+        }
+        
+        .cart-item-name {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        
+        .cart-item-details {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .cart-item-price {
+            text-align: right;
+        }
+        
+        .cart-item-quantity {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .cart-item-total {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        /* 会员信息 */
+        .member-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        
+        .member-info i {
+            color: #667eea;
+            margin-right: 8px;
+        }
+        
+        /* 结算区域 */
+        .checkout-area {
+            padding: 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #eee;
+        }
+        
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .total-row.grand-total {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            padding-top: 15px;
+            border-top: 1px dashed #ddd;
+        }
+        
+        .total-value {
+            color: #e74c3c;
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        .btn-checkout {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-checkout:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(102, 126, 234, 0.5);
+        }
+        
+        .btn-checkout:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+        
+        /* 快捷操作按钮 */
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .quick-actions button {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        
+        .quick-actions button:hover {
+            background: #f0f0f0;
+            border-color: #667eea;
+            color: #667eea;
+        }
+        
+        .quick-actions button i {
+            margin-right: 5px;
+        }
+        
+        /* 加载动画 */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            color: #667eea;
+        }
+        
+        .loading i {
+            font-size: 24px;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        /* 模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1050;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal.show {
+            display: block;
+        }
+        
+        .modal-dialog {
+            position: relative;
+            width: auto;
+            max-width: 500px;
+            margin: 50px auto;
+        }
+        
+        .modal-lg .modal-dialog {
+            max-width: 800px;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+        
+        .modal-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .modal-footer {
+            padding: 15px 20px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .btn-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #999;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+        }
+        
+        .btn-close:hover {
+            color: #333;
+        }
+        
+        /* 挂单列表样式 */
+        .suspended-orders-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .suspended-order-item {
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .suspended-order-item:hover {
+            background-color: #f8f9fa;
+            border-color: #667eea;
+        }
+        
+        .suspended-order-item.selected {
+            background-color: #e8f5e9;
+            border-color: #667eea;
+        }
+        
+        .order-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .order-no {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .order-time {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .order-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .order-item {
+            background-color: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .item-name {
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .item-quantity {
+            color: #667eea;
+            font-weight: 600;
+        }
+        
+        /* 订单备注样式 */
+        .order-note {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #f0f0f0;
+            font-size: 14px;
+        }
+        
+        .note-label {
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .note-content {
+            color: #333;
+            font-style: italic;
+        }
+        
+        /* 结算弹窗样式 */
+        .checkout-summary {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .summary-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .summary-item .label {
+            color: #666;
+        }
+        
+        .summary-item .value {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .summary-item .value.discount {
+            color: #28a745;
+        }
+        
+        .summary-item.total {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid #e9ecef;
+            font-size: 16px;
+        }
+        
+        .summary-item.total .value {
+            color: #667eea;
+            font-size: 18px;
+        }
+        
+        .payment-methods h6 {
+            margin-bottom: 15px;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .payment-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        
+        .payment-option {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .payment-option:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+        
+        .payment-option.selected {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+        
+        .payment-option input[type="radio"] {
+            display: none;
+        }
+        
+        .payment-option i {
+            font-size: 24px;
+            color: #667eea;
+        }
+        
+        .payment-option span {
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .payment-option .member-balance {
+            font-size: 12px;
+            color: #666;
+            font-weight: normal;
+        }
+    </style>
+</head>
+<body>
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+    <div id="app">
+        <!-- 顶部栏 -->
+        <div class="top-bar">
+            <h1><i class="bi bi-cart-check"></i>收银台</h1>
+            <div class="user-info">
+          
+                <span><i class="bi bi-person-circle"></i> {{ user.username }}</span>
+                {% verbatim %}
+                <span><i class="bi bi-clock"></i> {{ currentTime }}</span>
+                {% endverbatim %}
+                {% if user.role == 'admin' or user.role == 'manager' %}
+                <a href="{% url 'reports:dashboard' %}" class="btn-back-admin">
+                    <i class="bi bi-arrow-left-circle"></i> 返回后台
+                </a>
+                {% endif %}
+                <a href="{% url 'logout' %}" class="btn-logout">
+                    <i class="bi bi-box-arrow-right"></i> 退出
+                </a>
+            </div>
+        </div>
+        
+        <!-- 主区域 -->
+        <div class="pos-container">
+            <!-- 左侧商品区域 -->
+            <div class="products-section">
+                <!-- Tab导航 -->
+                {% verbatim %}
+                <div class="tab-nav">
+                    <button :class="{ active: activeTab === 'barcode' }" @click="switchTab('barcode')">
+                        <i class="bi bi-upc-scan"></i> 条码输入
+                    </button>
+                    <button :class="{ active: activeTab === 'manual' }" @click="switchTab('manual')">
+                        <i class="bi bi-plus-circle"></i> 手动添加
+                    </button>
+                    <button :class="{ active: activeTab === 'member' }" @click="switchTab('member')">
+                        <i class="bi bi-person"></i> 会员输入
+                    </button>
+                </div>
+                
+                <!-- 条码输入区 -->
+                <div v-show="activeTab === 'barcode'" class="tab-content">
+                    <div class="search-bar">
+                        <div class="input-group">
+                            <input type="text" v-model="barcodeInput" class="form-control" placeholder="请输入商品条码..." @keyup.enter="searchByBarcode" ref="barcodeInputRef">
+                            <button class="btn" type="button" @click="searchByBarcode">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="products-area">
+                        <!-- 已选择商品展示 -->
+                        <template v-if="cartItems.length > 0">
+                            <table class="product-table">
+                                <thead>
+                                    <tr>
+                                        <th>条码</th>
+                                        <th>产品图</th>
+                                        <th>名称</th>
+                                        <th>零售价</th>
+                                        <th>单位</th>
+                                        <th>分类</th>
+                                        <th>库存</th>
+                                        <th>数量</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="item in cartItems" :key="item.id">
+                                        <td>{{ item.barcode }}</td>
+                                        <td v-if="item.image"><img :src="item.image" :alt="item.name" style="width: 40px; height: 40px;"></td>
+                                        <td v-else><i class="bi bi-box" style="font-size: 24px; color: #999;"></i></td>
+                                        <td>{{ item.name }}</td>
+                                        <td>¥{{ item.price | formatPrice }}</td>
+                                        <td>{{ item.unit }}</td>
+                                        <td>{{ item.category || '未分类' }}</td>
+                                        <td>{{ item.stock || 0 }}</td>
+                                        <td><input type="number" v-model="item.quantity" class="form-control quantity-input" value="1" min="1" :max="item.stock" @change="updateCartItem(item)"></td>
+                                        <td><button class="btn-remove" @click="removeFromCart(item.id)">移除</button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </template>
+                        <div v-else class="empty-state">
+                            <i class="bi bi-upc-scan"></i>
+                            <p>请输入商品条码并回车搜索</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 手动添加区 -->
+                <div v-show="activeTab === 'manual'" class="tab-content">
+                    <div class="search-bar">
+                        <div class="input-group">
+                            <input type="text" v-model="manualSearchInput" class="form-control" placeholder="请输入商品名称或条码...">
+                            <button class="btn" type="button" @click="searchProducts">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="products-area">
+                        <div v-if="isLoading" class="loading">
+                            <i class="bi bi-arrow-repeat"></i> 搜索中...
+                        </div>
+                        <template v-else-if="manualProducts.length > 0">
+                            <table class="product-table">
+                                <thead>
+                                    <tr>
+                                        <th>条码</th>
+                                        <th>产品图</th>
+                                        <th>名称</th>
+                                        <th>零售价</th>
+                                        <th>单位</th>
+                                        <th>分类</th>
+                                        <th>库存</th>
+                                        <th>数量</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="product in manualProducts" :key="product.id">
+                                        <td>{{ product.barcode }}</td>
+                                        <td><img :src="product.image" :alt="product.name"></td>
+                                        <td>{{ product.name }}</td>
+                                        <td>¥{{ product.price | formatPrice }}</td>
+                                        <td>{{ product.unit }}</td>
+                                        <td>{{ product.category }}</td>
+                                        <td>{{ product.stock }}</td>
+                                        <td><input type="number" v-model="product.quantity" class="form-control quantity-input" value="1" min="1" :max="product.stock"></td>
+                                        <td><button class="btn-add" @click="addProduct(product)">添加</button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="pagination">
+                                <button class="active">1</button>
+                            </div>
+                        </template>
+                        <div v-else class="empty-state">
+                            <i class="bi bi-box-seam"></i>
+                            <p>请输入商品名称或条码搜索</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 会员输入区 -->
+                <div v-show="activeTab === 'member'" class="tab-content">
+                    <div class="search-bar">
+                        <div class="input-group">
+                            <input type="text" v-model="memberSearchInput" class="form-control" placeholder="请输入会员手机号...">
+                            <button class="btn" type="button" @click="searchMembers">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="products-area">
+                        <div v-if="isLoading" class="loading">
+                            <i class="bi bi-arrow-repeat"></i> 搜索中...
+                        </div>
+                        <template v-else-if="members.length > 0">
+                            <table class="product-table">
+                                <thead>
+                                    <tr>
+                                        <th>卡号</th>
+                                        <th>姓名</th>
+                                        <th>手机号</th>
+                                        <th>等级</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="member in members" :key="member.id">
+                                        <td>{{ member.card_no }}</td>
+                                        <td>{{ member.name }}</td>
+                                        <td>{{ member.phone }}</td>
+                                        <td>{{ member.level }}</td>
+                                        <td><button class="btn-add" @click="selectMember(member)">选择会员</button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="pagination">
+                                <button class="active">1</button>
+                            </div>
+                        </template>
+                        <div v-else class="empty-state">
+                            <i class="bi bi-people"></i>
+                            <p>请输入会员手机号搜索</p>
+                        </div>
+                    </div>
+                </div>
+                {% endverbatim %}
+            </div>
+            
+            <!-- 右侧购物车区域 -->
+            {% verbatim %}
+            <div class="cart-section">
+                <div class="cart-header">
+                    <h3><i class="bi bi-cart3"></i>购物车</h3>
+                </div>
+                
+                <div class="cart-items">
+                    <template v-if="cartItems.length > 0">
+                        <table class="product-table">
+                            <thead>
+                                <tr>
+                                    <th>产品名称</th>
+                                    <th>单位</th>
+                                    <th>数量</th>
+                                    <th>价格</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="item in cartItems" :key="item.id">
+                                    <td>{{ item.name }}</td>
+                                    <td>{{ item.unit }}</td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td>¥{{ item.total | formatPrice }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </template>
+                    <div v-else class="empty-cart">
+                        <i class="bi bi-cart"></i>
+                        <p>购物车是空的</p>
+                        <small>请添加商品到购物车</small>
+                    </div>
+                </div>
+                
+                <div class="checkout-area">
+                    <div class="total-row">
+                        <span>商品数量</span>
+                        <span>{{ totalQuantity }} 件</span>
+                    </div>
+                    <div class="total-row">
+                        <span>优惠金额</span>
+                        <span>¥{{ discountAmount | formatPrice }}</span>
+                    </div>
+                    <!-- 会员信息 -->
+                    <div v-if="selectedMember" class="total-row">
+                        <span>会员卡号</span>
+                        <span>{{ selectedMember.card_no }}</span>
+                    </div>
+                    <div class="total-row grand-total">
+                        <span>应付金额</span>
+                        <span class="total-value">¥{{ totalAmount | formatPrice }}</span>
+                    </div>
+                    
+                    <button class="btn-checkout" @click="showCheckoutModal" :disabled="cartItems.length === 0">
+                        <i class="bi bi-credit-card"></i> 结算
+                    </button>
+                    
+                    <div class="quick-actions">
+                        <button @click="showSuspendModal">
+                            <i class="bi bi-pause-circle"></i>挂单
+                        </button>
+                        <button @click="showResumeModal">
+                            <i class="bi bi-play-circle"></i>取单
+                        </button>
+                        <button @click="clearCart">
+                            <i class="bi bi-trash"></i>清空
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 挂单确认弹窗 -->
+            <div class="modal fade" id="suspendModal" tabindex="-1" aria-labelledby="suspendModalLabel">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">挂单确认</h5>
+                            <button type="button" class="btn-close" @click="closeModal('suspendModal')">
+                                <span>&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label>备注</label>
+                                <input type="text" class="form-control" v-model="suspendNote" placeholder="请输入挂单备注（可选）">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" @click="closeModal('suspendModal')">取消</button>
+                            <button type="button" class="btn btn-primary" @click="confirmSuspend">确认挂单</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 取单选择弹窗 -->
+            <div class="modal fade" id="resumeModal" tabindex="-1" aria-labelledby="resumeModalLabel">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">选择挂单</h5>
+                            <button type="button" class="btn-close" @click="closeModal('resumeModal')">
+                                <span>&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div v-if="suspendedOrders.length === 0" class="empty-state">
+                                <i class="bi bi-inbox"></i>
+                                <p>暂无挂单记录</p>
+                            </div>
+                            <div v-else class="suspended-orders-list">
+                                <div class="suspended-order-item" v-for="order in suspendedOrders" :key="order.id" 
+                                     :class="{ 'selected': selectedSuspendedOrder && selectedSuspendedOrder.id === order.id }" 
+                                     @click="selectSuspendedOrder(order)">
+                                    <div class="order-info">
+                                <div class="order-no">订单号：{{ order.order_no }}</div>
+                                <div class="order-time">{{ order.create_time }}</div>
+                            </div>
+                            <div class="order-items">
+                                <div v-for="item in order.cart_data" :key="item.id" class="order-item">
+                                    <span class="item-name">{{ item.name }}</span>
+                                    <span class="item-quantity">x{{ item.quantity }}</span>
+                                </div>
+                            </div>
+                            <div v-if="order.note" class="order-note">
+                                <span class="note-label">备注：</span>
+                                <span class="note-content">{{ order.note }}</span>
+                            </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" @click="closeModal('resumeModal')">取消</button>
+                            <button type="button" class="btn btn-primary" @click="confirmResume" :disabled="!selectedSuspendedOrder">确认取单</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 结算确认弹窗 -->
+            <div class="modal fade" id="checkoutModal" tabindex="-1" aria-labelledby="checkoutModalLabel">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">结算确认</h5>
+                            <button type="button" class="btn-close" @click="closeModal('checkoutModal')">
+                                <span>&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="checkout-summary">
+                                <div class="summary-item">
+                                    <span class="label">商品总数：</span>
+                                    <span class="value">{{ totalQuantity }} 件</span>
+                                </div>
+                                <div class="summary-item">
+                                    <span class="label">订单总额：</span>
+                                    <span class="value">¥{{ totalAmount | formatPrice }}</span>
+                                </div>
+                                <div class="summary-item" v-if="discountAmount > 0">
+                                    <span class="label">优惠金额：</span>
+                                    <span class="value discount">-¥{{ discountAmount | formatPrice }}</span>
+                                </div>
+                                <div class="summary-item total">
+                                    <span class="label">应付金额：</span>
+                                    <span class="value">¥{{ totalAmount - discountAmount | formatPrice }}</span>
+                                </div>
+                            </div>
+                            <div class="payment-methods">
+                                <h6>选择支付方式</h6>
+                                <div class="payment-options">
+                                    <label class="payment-option" :class="{ 'selected': selectedPaymentMethod === 'cash' }">
+                                        <input type="radio" v-model="selectedPaymentMethod" value="cash">
+                                        <i class="bi bi-cash"></i>
+                                        <span>现金</span>
+                                    </label>
+                                    <label class="payment-option" :class="{ 'selected': selectedPaymentMethod === 'wechat' }">
+                                        <input type="radio" v-model="selectedPaymentMethod" value="wechat">
+                                        <i class="bi bi-wechat"></i>
+                                        <span>微信</span>
+                                    </label>
+                                    <label class="payment-option" :class="{ 'selected': selectedPaymentMethod === 'alipay' }">
+                                        <input type="radio" v-model="selectedPaymentMethod" value="alipay">
+                                        <i class="bi bi-alipay"></i>
+                                        <span>支付宝</span>
+                                    </label>
+                                    <label class="payment-option" v-if="selectedMember" :class="{ 'selected': selectedPaymentMethod === 'member' }">
+                                        <input type="radio" v-model="selectedPaymentMethod" value="member">
+                                        <i class="bi bi-credit-card"></i>
+                                        <span>会员卡</span>
+                                        <span class="member-balance">余额：¥{{ selectedMember.balance | formatPrice }}</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" @click="closeModal('checkoutModal')">取消</button>
+                            <button type="button" class="btn btn-primary" @click="confirmCheckout" :disabled="!selectedPaymentMethod || isSubmitting">
+                                <span v-if="isSubmitting">处理中...</span>
+                                <span v-else>确认收款</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endverbatim %}</div>
+        </div>
+    </div>
+    
+    
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Element UI CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui@2.15.13/lib/theme-chalk/index.css">
+    <!-- Element UI JS -->
+    <script src="https://unpkg.com/element-ui@2.15.13/lib/index.js"></script>
+    
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data: {
+                activeTab: 'barcode',
+                barcodeInput: '',
+                manualSearchInput: '',
+                memberSearchInput: '',
+                cartItems: [],
+                selectedMember: null,
+                manualProducts: [],
+                members: [],
+                isLoading: false,
+                currentTime: '',
+                discountAmount: 0,
+                suspendNote: '',
+                suspendedOrders: [],
+                selectedSuspendedOrder: null,
+                selectedPaymentMethod: '',
+                isSubmitting: false
+            },
+            computed: {
+                totalQuantity: function() {
+                    return this.cartItems.reduce(function(total, item) {
+                        return total + (parseInt(item.quantity) || 0);
+                    }, 0);
+                },
+                totalAmount: function() {
+                    return this.cartItems.reduce(function(total, item) {
+                        return total + (parseFloat(item.total) || 0);
+                    }, 0);
+                }
+            },
+            filters: {
+                formatPrice: function(price) {
+                    return parseFloat(price).toFixed(2);
+                }
+            },
+            methods: {
+                updateTime: function() {
+                    var now = new Date();
+                    var timeString = now.toLocaleString('zh-CN', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit'
+                    });
+                    this.currentTime = timeString;
+                },
+                switchTab: function(tabName) {
+                    this.activeTab = tabName;
+                    // 聚焦到搜索框
+                    var self = this;
+                    setTimeout(function() {
+                        if (tabName === 'barcode' && self.$refs.barcodeInputRef) {
+                            self.$refs.barcodeInputRef.focus();
+                        }
+                    }, 100);
+                },
+                searchByBarcode: function() {
+                    var barcode = this.barcodeInput.trim();
+                    if (!barcode) {
+                        this.$message.warning('请输入商品条码');
+                        return;
+                    }
+                    
+                    this.isLoading = true;
+                    var self = this;
+                    
+                    // 使用$.ajax请求后台接口
+                    $.ajax({
+                        url: '{% url "products:api_search_products" %}',
+                        type: 'GET',
+                        data: {
+                            keyword: barcode,
+                            type: 'barcode'
+                        },
+                        success: function(response) {
+                            self.isLoading = false;
+                            if (response.success && response.data.length > 0) {
+                                // 找到商品，添加到购物车
+                                var product = response.data[0];
+                                self.addToCart(product, 1);
+                                
+                                // 清空输入
+                                self.barcodeInput = '';
+                                if (self.$refs.barcodeInputRef) {
+                                    self.$refs.barcodeInputRef.focus();
+                                }
+                            } else {
+                                self.$message.info('未找到对应商品');
+                            }
+                        },
+                        error: function() {
+                            self.isLoading = false;
+                            this.$message.error('搜索失败，请稍后重试');
+                        }
+                    });
+                },
+                searchProducts: function() {
+                    var keyword = this.manualSearchInput.trim();
+                    if (!keyword) {
+                        this.$message.warning('请输入商品名称或条码');
+                        return;
+                    }
+                    
+                    this.isLoading = true;
+                    var self = this;
+                    
+                    // 使用$.ajax请求后台接口
+                    $.ajax({
+                        url: '{% url "products:api_search_products" %}',
+                        type: 'GET',
+                        data: {
+                            keyword: keyword,
+                            type: 'name'
+                        },
+                        success: function(response) {
+                            self.isLoading = false;
+                            if (response.success) {
+                                // 为每个商品添加quantity字段
+                                self.manualProducts = response.data.map(function(product) {
+                                    product.quantity = 1;
+                                    return product;
+                                });
+                                if (self.manualProducts.length === 0) {
+                                    this.$message.info('未找到匹配的商品');
+                                }
+                            } else {
+                                this.$message.error(response.message || '搜索失败');
+                            }
+                        },
+                        error: function() {
+                            self.isLoading = false;
+                            this.$message.error('搜索失败，请稍后重试');
+                        }
+                    });
+                },
+                searchMembers: function() {
+                    var phone = this.memberSearchInput.trim();
+                    if (!phone) {
+                        this.$message.warning('请输入会员手机号');
+                        return;
+                    }
+                    
+                    this.isLoading = true;
+                    var self = this;
+                    
+                    // 使用$.ajax请求后台接口
+                    $.ajax({
+                        url: '{% url "members:api_search_members" %}',
+                        type: 'GET',
+                        data: {
+                            phone: phone
+                        },
+                        success: function(response) {
+                            self.isLoading = false;
+                            if (response.success) {
+                                self.members = response.data;
+                                if (self.members.length === 0) {
+                                    this.$message.info('未找到匹配的会员');
+                                }
+                            } else {
+                                this.$message.error(response.message || '搜索失败');
+                            }
+                        },
+                        error: function() {
+                            self.isLoading = false;
+                            this.$message.error('搜索失败，请稍后重试');
+                        }
+                    });
+                },
+                addToCart: function(product, quantity) {
+                    // 确保quantity是数字类型
+                    quantity = parseInt(quantity) || 1;
+                    
+                    // 检查是否已存在
+                    var existingItem = this.cartItems.find(function(item) {
+                        return item.id === product.id;
+                    });
+                    if (existingItem) {
+                        // 确保existingItem.quantity是数字类型
+                        existingItem.quantity = parseInt(existingItem.quantity) || 0;
+                        existingItem.quantity += quantity;
+                        existingItem.total = existingItem.price * existingItem.quantity;
+                    } else {
+                        this.cartItems.push({
+                            id: product.id,
+                            barcode: product.barcode,
+                            name: product.name,
+                            price: product.price,
+                            unit: product.unit,
+                            quantity: quantity,
+                            total: product.price * quantity,
+                            category: product.category,
+                            stock: product.stock,
+                            image: product.image
+                        });
+                    }
+                },
+                addProduct: function(product) {
+                    this.addToCart(product, product.quantity || 1);
+                },
+                updateCartItem: function(item) {
+                    // 更新购物车中商品的数量和总价
+                    item.total = item.price * item.quantity;
+                },
+                removeFromCart: function(productId) {
+                    var index = this.cartItems.findIndex(function(item) {
+                        return item.id === productId;
+                    });
+                    if (index !== -1) {
+                        this.cartItems.splice(index, 1);
+                    }
+                },
+                selectMember: function(member) {
+                    this.selectedMember = member;
+                },
+                clearCart: function() {
+                    if (this.cartItems.length === 0) return;
+                    
+                    if (confirm('确定要清空购物车吗？')) {
+                        this.cartItems = [];
+                    }
+                },
+                closeModal: function(modalId) {
+                    console.log(modalId);
+                    $('#' + modalId).removeClass('show');
+                },
+                showSuspendModal: function() {
+                    if (this.cartItems.length === 0) {
+                        this.$message.warning('购物车为空，无法挂单');
+                        return;
+                    }
+                    this.suspendNote = '';
+                    $('#suspendModal').addClass('show');
+                },
+                confirmSuspend: function() {
+                    var self = this;
+                    $.ajax({
+                        url: '{% url "sales:api_suspend_order" %}',
+                        type: 'POST',
+                        data: {
+                            cart_items: JSON.stringify(this.cartItems),
+                            member_id: this.selectedMember ? this.selectedMember.id : null,
+                            note: this.suspendNote,
+                            csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').val()
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                self.$message.success('挂单成功');
+                                $('#suspendModal').removeClass('show');
+                                self.cartItems = [];
+                                self.selectedMember = null;
+                                self.discountAmount = 0;
+                            } else {
+                                self.$message.error(response.message || '挂单失败');
+                            }
+                        },
+                        error: function() {
+                            self.$message.error('挂单失败，请稍后重试');
+                        }
+                    });
+                },
+                showResumeModal: function() {
+                    var self = this;
+                    $.ajax({
+                        url: '{% url "sales:api_get_suspended_orders" %}',
+                        type: 'GET',
+                        success: function(response) {
+                            if (response.success) {
+                                self.suspendedOrders = response.data;
+                                self.selectedSuspendedOrder = null;
+                                $('#resumeModal').addClass('show');
+                            } else {
+                                self.$message.error(response.message || '获取挂单失败');
+                            }
+                        },
+                        error: function() {
+                            self.$message.error('获取挂单失败，请稍后重试');
+                        }
+                    });
+                },
+                selectSuspendedOrder: function(order) {
+                    this.selectedSuspendedOrder = order;
+                },
+                confirmResume: function() {
+                    if (!this.selectedSuspendedOrder) {
+                        return;
+                    }
+                    
+                    var self = this;
+                    $.ajax({
+                        url: '{% url "sales:api_resume_order" %}',
+                        type: 'POST',
+                        data: {
+                            order_id: this.selectedSuspendedOrder.id,
+                            csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').val()
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                $('#resumeModal').removeClass('show');
+                                self.cartItems = response.data.cart_items;
+                                self.selectedMember = response.data.member;
+                                self.discountAmount = response.data.discount_amount || 0;
+                            } else {
+                                self.$message.error(response.message || '取单失败');
+                            }
+                        },
+                        error: function() {
+                            self.$message.error('取单失败，请稍后重试');
+                        }
+                    });
+                },
+                showCheckoutModal: function() {
+                    if (this.cartItems.length === 0) {
+                        this.$message.warning('购物车为空，无法结算');
+                        return;
+                    }
+                    this.selectedPaymentMethod = '';
+                    $('#checkoutModal').addClass('show');
+                },
+                confirmCheckout: function() {
+                    if (!this.selectedPaymentMethod) {
+                        this.$message.warning('请选择支付方式');
+                        return;
+                    }
+                    
+                    if (this.isSubmitting) {
+                        return;
+                    }
+                    
+                    this.isSubmitting = true;
+                    
+                    var self = this;
+                    $.ajax({
+                        url: '{% url "sales:api_checkout" %}',
+                        type: 'POST',
+                        data: {
+                            cart_items: JSON.stringify(this.cartItems),
+                            member_id: this.selectedMember ? this.selectedMember.id : null,
+                            payment_method: this.selectedPaymentMethod,
+                            discount_amount: this.discountAmount,
+                            csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').val()
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                self.$message.success('结算成功，订单号：' + response.data.order_no);
+                                $('#checkoutModal').removeClass('show');
+                                self.cartItems = [];
+                                self.selectedMember = null;
+                                self.discountAmount = 0;
+                                self.selectedPaymentMethod = '';
+                            } else {
+                                self.$message.error(response.message || '结算失败');
+                            }
+                        },
+                        error: function() {
+                            self.$message.error('结算失败，请稍后重试');
+                        },
+                        complete: function() {
+                            self.isSubmitting = false;
+                        }
+                    });
+                }
+
+            },
+            mounted: function() {
+           
+                this.updateTime();
+                var self = this;
+                setInterval(function() {
+                    self.updateTime();
+                }, 1000);
+                if (this.$refs.barcodeInputRef) {
+                    this.$refs.barcodeInputRef.focus();
+                }
+            }
+        });
+
+
+// /**
+//  * 阻止浏览器的返回按钮，并重定向到指定页面
+//  * @param {string} targetUrl - 目标页面的完整 URL
+//  */
+// function blockBackAndRedirect(targetUrl) {
+
+//     console.log("blockBackAndRedirect");
+//     // 1. 在历史记录中添加一个当前页面的副本，带自定义状态标记
+//     //    这样用户点击返回时，会先回到这个副本，触发 popstate 事件
+//     if (!history.state || !history.state._blockBack) {
+//         history.pushState({ _blockBack: true }, '', location.href);
+//     }
+
+//     // 2. 定义 popstate 事件处理函数
+//     function onPopState(event) {
+//         // 防止多次触发（例如连续快速点击返回）
+//         if (window._blockBackHandled) return;
+//         window._blockBackHandled = true;
+
+//         // 3. 跳转到目标页面，使用 location.replace 替换当前历史记录
+//         //    这样目标页面会取代当前页面在历史中的位置，避免循环
+//         location.replace(targetUrl);
+//     }
+
+//     // 4. 移除之前可能存在的相同监听器（避免重复绑定）
+//     if (window._blockBackListener) {
+//         window.removeEventListener('popstate', window._blockBackListener);
+//     }
+
+//     // 5. 绑定新监听器，并将引用保存以便清理
+//     window.addEventListener('popstate', onPopState);
+//     window._blockBackListener = onPopState;
+//     window._blockBackHandled = false; // 重置标记
+// }
+    //   blockBackAndRedirect("{% url 'reports:dashboard' %}");
+
+    </script>
+</body>
+</html>

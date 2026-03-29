@@ -1,0 +1,12 @@
+{% extends 'public/base.html' %}
+
+{% block title %}数据统计 - 零售店POS系统{% endblock %}
+
+{% block extra_css %}
+<!-- ECharts CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.css">
+{% endblock %}
+
+{% block content %}
+{% include 'reports/reports_content.html' %}
+{% endblock %}
