@@ -1,0 +1,167 @@
+{% extends 'public/base.html' %}
+
+{% block title %}{% if product %}编辑商品{% else %}新增商品{% endif %} - 零售店POS系统{% endblock %}
+
+{% block content %}
+<!-- 页面标题 -->
+<div class="page-header">
+    <h1 class="page-title">{% if product %}编辑商品{% else %}新增商品{% endif %}</h1>
+    <div class="page-actions">
+        <a href="{% url 'products:product_list' %}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i>
+            返回列表
+        </a>
+    </div>
+</div>
+
+<!-- 内容区域 -->
+<div class="card">
+    <div class="card-body">
+        <!-- 错误信息 -->
+        {% if error %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-circle-fill"></i>
+            {{ error }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endif %}
+
+        <!-- 商品表单 -->
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-section">
+                <h3>基本信息</h3>
+                <div class="form-row">
+                    <div class="form-item">
+                        <label for="barcode" class="form-label">条形码 *</label>
+                        <input type="text" id="barcode" name="barcode" class="form-control" placeholder="请输入条形码" value="{% if form_data.barcode %}{{ form_data.barcode }}{% elif product %}{{ product.barcode|default:'' }}{% endif %}">
+                    </div>
+                    <div class="form-item">
+                        <label for="name" class="form-label">商品名称 *</label>
+                        <input type="text" id="name" name="name" class="form-control" placeholder="请输入商品名称" value="{% if form_data.name %}{{ form_data.name }}{% elif product %}{{ product.name }}{% endif %}" required>
+                    </div>
+                    <div class="form-item">
+                        <label for="category" class="form-label">商品分类 *</label>
+                        <select id="category" name="category" class="form-select" required>
+                            <option value="">请选择分类</option>
+                            {% for category in all_categories %}
+                            <option value="{{ category.id }}" 
+                                {% if form_data.category == category.id|stringformat:'s' %}selected
+                                {% elif product and product.category.id == category.id %}selected{% endif %}>
+                                {% for i in "12345" %}
+                                    {% if forloop.counter < category.level %}
+                                        └─
+                                    {% endif %}
+                                {% endfor %}
+                                {{ category.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-item">
+                        <label for="unit" class="form-label">单位</label>
+                        <input type="text" id="unit" name="unit" class="form-control" placeholder="例如：件、个、瓶" value="{% if form_data.unit %}{{ form_data.unit }}{% elif product %}{{ product.unit }}{% else %}件{% endif %}">
+                    </div>
+                    <div class="form-item">
+                        <label for="status" class="form-label">上架状态</label>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="status" name="status" value="1" 
+                                {% if form_data.status == '1' %}checked
+                                {% elif product and product.status %}checked
+                                {% elif not product and not form_data %}checked{% endif %}>
+                            <label class="form-check-label" for="status">上架</label>
+                        </div>
+                    </div>
+                    <div class="form-item">
+                        <label for="image" class="form-label">商品图片</label>
+                        <input type="file" id="image" name="image" class="form-control" accept="image/*" onchange="previewImage(event)">
+                        <div id="imagePreview" class="image-preview" style="{% if product and product.image %}display: block;{% else %}display: none;{% endif %}">
+                            <img id="previewImg" src="{% if product and product.image %}{{ product.image.url }}{% endif %}" alt="商品图片预览" style="max-width: 200px; max-height: 200px; margin-top: 10px;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>价格与库存</h3>
+                <div class="form-row">
+                    <div class="form-item">
+                        <label for="price" class="form-label">零售价 *</label>
+                        <input type="number" id="price" name="price" class="form-control" placeholder="0.00" step="0.01" min="0" value="{% if form_data.price %}{{ form_data.price }}{% elif product %}{{ product.price }}{% endif %}" required>
+                    </div>
+                    <div class="form-item">
+                        <label for="cost" class="form-label">成本价</label>
+                        <input type="number" id="cost" name="cost" class="form-control" placeholder="0.00" step="0.01" min="0" value="{% if form_data.cost %}{{ form_data.cost }}{% elif product %}{{ product.cost }}{% else %}0.00{% endif %}">
+                    </div>
+                    <div class="form-item">
+                        <label for="stock" class="form-label">{% if product %}当前库存{% else %}初始库存{% endif %}</label>
+                        <input type="number" id="stock" name="stock" class="form-control" placeholder="0" step="1" min="0" value="{% if form_data.stock %}{{ form_data.stock }}{% elif product %}{{ product.stock }}{% else %}0{% endif %}">
+                    </div>
+                    <div class="form-item">
+                        <label for="warning_stock" class="form-label">预警库存</label>
+                        <input type="number" id="warning_stock" name="warning_stock" class="form-control" placeholder="5" step="1" min="0" value="{% if form_data.warning_stock %}{{ form_data.warning_stock }}{% elif product %}{{ product.warning_stock }}{% else %}5{% endif %}">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>保质期信息</h3>
+                <div class="form-row">
+                    <div class="form-item">
+                        <label for="expiry_date" class="form-label">过期时间</label>
+                        <input type="datetime-local" id="expiry_date" name="expiry_date" class="form-control" value="{% if form_data.expiry_date %}{{ form_data.expiry_date }}{% elif product and product.expiry_date %}{{ product.expiry_date|date:'Y-m-d\TH:i' }}{% endif %}">
+                    </div>
+                    <div class="form-item">
+                        <label for="shelf_life" class="form-label">保质期(天)</label>
+                        <input type="number" id="shelf_life" name="shelf_life" class="form-control" placeholder="例如：30" step="1" min="1" value="{% if form_data.shelf_life %}{{ form_data.shelf_life }}{% elif product %}{{ product.shelf_life|default:'' }}{% endif %}">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save"></i>
+                    保存
+                </button>
+                <button type="reset" class="btn btn-secondary">
+                    <i class="bi bi-arrow-counterclockwise"></i>
+                    重置
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function previewImage(event) {
+    var file = event.target.files[0];
+    if (file) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            var preview = document.getElementById('imagePreview');
+            var img = document.getElementById('previewImg');
+            img.src = e.target.result;
+            preview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    } else {
+        var preview = document.getElementById('imagePreview');
+        preview.style.display = 'none';
+    }
+}
+
+// 重置表单时隐藏预览（编辑模式下显示原图片）
+document.querySelector('form').addEventListener('reset', function() {
+    var preview = document.getElementById('imagePreview');
+    var img = document.getElementById('previewImg');
+    {% if product and product.image %}
+    img.src = '{{ product.image.url }}';
+    preview.style.display = 'block';
+    {% else %}
+    preview.style.display = 'none';
+    {% endif %}
+});
+</script>
+{% endblock %}

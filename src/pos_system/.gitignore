@@ -1,0 +1,112 @@
+# Python 缓存
+__pycache__/
+*.py[cod]
+*.so
+*.pyo
+
+# 虚拟环境
+venv/
+env/
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# 打包文件
+*.egg-info/
+dist/
+build/
+builds/
+
+# IDE 配置
+.vscode/
+.idea/
+*.sublime-*
+*.swp
+*.swo
+*~
+
+# 操作系统文件
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# 日志文件
+*.log
+logs/
+log/
+
+# 数据库文件
+*.db
+*.sqlite3
+*.sqlite
+
+# 测试相关
+.coverage
+coverage.xml
+.pytest_cache/
+test-results/
+test_package.py
+
+
+# 其他临时文件
+tmp/
+temp/
+*.tmp
+*.temp
+
+# 备份文件
+*.bak
+/backups
+*.old
+
+#其他无关文件
+/resource
+
+# 敏感文件
+*.key
+*.pem
+*.crt
+*.p12
+*.pfx
+
+# 编译输出
+*.o
+*.obj
+*.class
+
+# 依赖管理
+Pipfile.lock
+poetry.lock
+
+#导入导出脚本
+check_products.py
+export_data.py
+export_mysql_data.py
+import_data.py
+init_data.py
+
+
+# 数据文件
+data_export.json
+mysql_data_export.json
+
+# 截图文件
+*.png
+*.jpg
+*.jpeg
+*.gif
+
+
+/backups

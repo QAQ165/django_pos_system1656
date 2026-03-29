@@ -1,0 +1,663 @@
+<style>
+/* 页面头部 */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.page-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+.btn-add {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    padding: 10px 25px;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-add:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+/* 表格容器 */
+.table-container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    overflow: hidden;
+}
+
+/* 表格样式 */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+    padding: 15px 20px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.data-table th {
+    background: #f8f9fa;
+    font-weight: 600;
+    color: #555;
+    font-size: 14px;
+}
+
+.data-table td {
+    font-size: 14px;
+    color: #666;
+}
+
+.data-table tr:hover td {
+    background: #f8f9fa;
+}
+
+/* 状态标签 */
+.status-badge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.status-badge.active {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.status-badge.inactive {
+    background: #ffebee;
+    color: #c62828;
+}
+
+/* 角色标签 */
+.role-badge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.role-badge.admin {
+    background: #e3f2fd;
+    color: #1565c0;
+}
+
+.role-badge.manager {
+    background: #fff3e0;
+    color: #e65100;
+}
+
+.role-badge.cashier {
+    background: #f3e5f5;
+    color: #7b1fa2;
+}
+
+/* 操作按钮 */
+.action-btn {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    margin-right: 5px;
+}
+
+.action-btn.edit {
+    background: #e3f2fd;
+    color: #1565c0;
+}
+
+.action-btn.edit:hover {
+    background: #bbdefb;
+}
+
+.action-btn.toggle {
+    background: #fff3e0;
+    color: #e65100;
+}
+
+.action-btn.toggle:hover {
+    background: #ffe0b2;
+}
+
+.action-btn.reset {
+    background: #f3e5f5;
+    color: #7b1fa2;
+}
+
+.action-btn.reset:hover {
+    background: #e1bee7;
+}
+
+.action-btn.delete {
+    background: #ffebee;
+    color: #c62828;
+}
+
+.action-btn.delete:hover {
+    background: #ffcdd2;
+}
+
+/* 模态框 */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 12px;
+    width: 450px;
+    max-width: 90%;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.modal-header {
+    padding: 20px 25px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #999;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+.modal-close:hover {
+    color: #666;
+}
+
+.modal-body {
+    padding: 25px;
+}
+
+.modal-footer {
+    padding: 15px 25px;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+/* 表单样式 */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    font-weight: 500;
+    color: #555;
+    margin-bottom: 8px;
+}
+
+.form-label .required {
+    color: #c62828;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.3s;
+    box-sizing: border-box;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-select {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    background: white;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+/* 按钮样式 */
+.btn-cancel {
+    background: #f5f5f5;
+    border: none;
+    color: #666;
+    padding: 10px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-cancel:hover {
+    background: #e0e0e0;
+}
+
+.btn-submit {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    padding: 10px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* 提示信息 */
+.toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 25px;
+    border-radius: 8px;
+    color: white;
+    font-weight: 500;
+    z-index: 2000;
+    animation: slideIn 0.3s ease;
+}
+
+.toast.success {
+    background: #4caf50;
+}
+
+.toast.error {
+    background: #f44336;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* 空状态 */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #999;
+}
+
+.empty-state i {
+    font-size: 60px;
+    margin-bottom: 20px;
+    opacity: 0.3;
+}
+
+/* 加载动画 */
+.spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+</style>
+
+<!-- 页面头部 -->
+<div class="page-header">
+    <h1 class="page-title">员工管理</h1>
+    <button class="btn-add" onclick="openAddModal()">
+        <i class="bi bi-plus-circle"></i>
+        新增员工
+    </button>
+</div>
+
+<!-- 员工列表 -->
+<div class="table-container">
+    {% if users %}
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>员工账号</th>
+                <th>手机号</th>
+                <th>权限</th>
+                <th>状态</th>
+                <th>创建时间</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for u in users %}
+            <tr data-id="{{ u.id }}" data-username="{{ u.username }}" data-phone="{{ u.phone }}" data-role="{{ u.role }}" data-is-active="{{ u.is_active }}">
+                <td>{{ u.username }}</td>
+                <td>{{ u.phone|default:'-' }}</td>
+                <td>
+                    <span class="role-badge {{ u.role }}">{{ u.get_role_display }}</span>
+                </td>
+                <td>
+                    {% if u.is_active %}
+                        <span class="status-badge active">正常</span>
+                    {% else %}
+                        <span class="status-badge inactive">已禁用</span>
+                    {% endif %}
+                </td>
+                <td>{{ u.date_joined|date:"Y-m-d H:i" }}</td>
+                <td>
+                    <button class="action-btn edit" onclick="openEditModal(this)">
+                        <i class="bi bi-pencil"></i> 编辑
+                    </button>
+                    <button class="action-btn toggle" onclick="toggleActive({{ u.id }}, {{ u.is_active|yesno:'true,false' }})">
+                        <i class="bi bi-{% if u.is_active %}pause-circle{% else %}play-circle{% endif %}"></i>
+                        {% if u.is_active %}禁用{% else %}启用{% endif %}
+                    </button>
+                    <button class="action-btn reset" onclick="resetPassword({{ u.id }})">
+                        <i class="bi bi-key"></i> 重置密码
+                    </button>
+                    <button class="action-btn delete" onclick="deleteUser({{ u.id }}, '{{ u.username }}')">
+                        <i class="bi bi-trash"></i> 删除
+                    </button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+        <i class="bi bi-inbox"></i>
+        <p>暂无员工数据</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- 新增/编辑模态框 -->
+<div class="modal" id="userModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title" id="modalTitle">新增员工</h3>
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="userForm">
+                {% csrf_token %}
+                <input type="hidden" id="userId" name="user_id">
+                <input type="hidden" id="action" name="action" value="add">
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        员工账号 <span class="required">*</span>
+                    </label>
+                    <input type="text" class="form-control" id="username" name="username" placeholder="请输入员工账号" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">手机号</label>
+                    <input type="text" class="form-control" id="phone" name="phone" placeholder="请输入手机号" maxlength="11">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">
+                        权限 <span class="required">*</span>
+                    </label>
+                    <select class="form-select" id="role" name="role">
+                        <option value="cashier">收银员</option>
+                        <option value="manager">店长</option>
+                        <option value="admin">管理员</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeModal()">取消</button>
+            <button class="btn-submit" id="submitBtn" onclick="submitForm()">确定</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 打开新增模态框
+    function openAddModal() {
+        $('#modalTitle').text('新增员工');
+        $('#action').val('add');
+        $('#userId').val('');
+        $('#username').val('');
+        $('#phone').val('');
+        $('#role').val('cashier');
+        $('#userModal').addClass('show');
+    }
+    
+    // 打开编辑模态框
+    function openEditModal(btn) {
+        var $row = $(btn).closest('tr');
+        $('#modalTitle').text('编辑员工');
+        $('#action').val('edit');
+        $('#userId').val($row.data('id'));
+        $('#username').val($row.data('username'));
+        $('#phone').val($row.data('phone'));
+        $('#role').val($row.data('role'));
+        $('#userModal').addClass('show');
+    }
+    
+    // 关闭模态框
+    function closeModal() {
+        $('#userModal').removeClass('show');
+    }
+    
+    // 提交表单
+    function submitForm() {
+        var $submitBtn = $('#submitBtn');
+        var originalText = $submitBtn.html();
+        
+        $submitBtn.html('<span class="spinner"></span>提交中...');
+        $submitBtn.prop('disabled', true);
+        
+        var formData = new FormData($('#userForm')[0]);
+        
+        $.ajax({
+            url: window.location.href,
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            success: function(data) {
+                $submitBtn.html(originalText);
+                $submitBtn.prop('disabled', false);
+                
+                if (data.success) {
+                    showToast('success', data.message);
+                    closeModal();
+                    setTimeout(function() { loadPage(window.location.href); }, 1000);
+                } else {
+                    showToast('error', data.message);
+                }
+            },
+            error: function(xhr) {
+                $submitBtn.html(originalText);
+                $submitBtn.prop('disabled', false);
+                showToast('error', '操作失败：' + xhr.statusText);
+            }
+        });
+    }
+    
+    // 禁用/启用账号
+    function toggleActive(userId, currentStatus) {
+        var action = currentStatus ? '禁用' : '启用';
+        if (!confirm('确定要' + action + '该账号吗？')) {
+            return;
+        }
+        
+        var formData = new FormData();
+        formData.append('action', 'toggle_active');
+        formData.append('user_id', userId);
+        
+        $.ajax({
+            url: window.location.href,
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            success: function(data) {
+                if (data.success) {
+                    showToast('success', data.message);
+                    setTimeout(function() { loadPage(window.location.href); }, 1000);
+                } else {
+                    showToast('error', data.message);
+                }
+            },
+            error: function(xhr) {
+                showToast('error', '操作失败：' + xhr.statusText);
+            }
+        });
+    }
+    
+    // 重置密码
+    function resetPassword(userId) {
+        if (!confirm('确定要重置该员工的密码吗？密码将重置为888888')) {
+            return;
+        }
+        
+        var formData = new FormData();
+        formData.append('action', 'reset_password');
+        formData.append('user_id', userId);
+        
+        $.ajax({
+            url: window.location.href,
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            success: function(data) {
+                if (data.success) {
+                    showToast('success', data.message);
+                } else {
+                    showToast('error', data.message);
+                }
+            },
+            error: function(xhr) {
+                showToast('error', '操作失败：' + xhr.statusText);
+            }
+        });
+    }
+    
+    // 删除员工
+    function deleteUser(userId, username) {
+        if (!confirm('确定要删除员工"' + username + '"吗？此操作不可恢复！')) {
+            return;
+        }
+        
+        var formData = new FormData();
+        formData.append('action', 'delete');
+        formData.append('user_id', userId);
+        
+        $.ajax({
+            url: window.location.href,
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            success: function(data) {
+                if (data.success) {
+                    showToast('success', data.message);
+                    setTimeout(function() { loadPage(window.location.href); }, 1000);
+                } else {
+                    showToast('error', data.message);
+                }
+            },
+            error: function(xhr) {
+                showToast('error', '操作失败：' + xhr.statusText);
+            }
+        });
+    }
+    
+    // 显示提示信息
+    function showToast(type, message) {
+        var $toast = $('<div class="toast ' + type + '">' + message + '</div>');
+        $('body').append($toast);
+        
+        setTimeout(function() {
+            $toast.remove();
+        }, 3000);
+    }
+    
+    // 点击模态框外部关闭
+    $('#userModal').on('click', function(e) {
+        if (e.target === this) {
+            closeModal();
+        }
+    });
+</script>

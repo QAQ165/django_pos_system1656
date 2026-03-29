@@ -1,0 +1,410 @@
+
+<style> 
+    /* 按钮样式 */
+        .btn-add, .btn-save, .btn-primary-custom {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        
+        .btn-add:hover, .btn-save:hover, .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+</style>
+
+<!-- 页面标题 -->
+<div class="page-header">
+    <h1 class="page-title">仪表盘</h1>
+    <div class="page-actions">
+        <button class="btn-primary-custom" onclick="window.location.href='/sales/pos/'">
+            <i class="bi bi-plus-circle"></i>
+            快速开单
+        </button>
+    </div>
+</div>
+
+<!-- 欢迎信息 -->
+<div class="content-card">
+    <h4 style="color: #333; margin-bottom: 10px;">
+        欢迎回来，{{ user.username }}
+    </h4>
+    <p style="color: #666; margin: 0;">
+        今天是 {% now "Y年m月d日" %}，{% now "H:i" %}，祝您工作愉快！
+    </p>
+</div>
+
+<!-- 统计卡片 -->
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="content-card" style="padding: 20px; text-align: center;">
+            <div style="width: 60px; height: 60px; background: #e3f2fd; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
+                <i class="bi bi-currency-dollar" style="font-size: 28px; color: #1976d2;"></i>
+            </div>
+            <h3 style="font-size: 32px; font-weight: 700; color: #333; margin: 0 0 5px;" id="todaySales">¥0.00</h3>
+            <p style="color: #888; margin: 0; font-size: 14px;">今日销售额</p>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="content-card" style="padding: 20px; text-align: center;">
+            <div style="width: 60px; height: 60px; background: #f3e5f5; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
+                <i class="bi bi-receipt" style="font-size: 28px; color: #7b1fa2;"></i>
+            </div>
+            <h3 style="font-size: 32px; font-weight: 700; color: #333; margin: 0 0 5px;" id="todayOrders">0</h3>
+            <p style="color: #888; margin: 0; font-size: 14px;">今日订单数</p>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="content-card" style="padding: 20px; text-align: center;">
+            <div style="width: 60px; height: 60px; background: #e8f5e9; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
+                <i class="bi bi-box" style="font-size: 28px; color: #388e3c;"></i>
+            </div>
+            <h3 style="font-size: 32px; font-weight: 700; color: #333; margin: 0 0 5px;" id="totalProducts">{{ total_products }}</h3>
+            <p style="color: #888; margin: 0; font-size: 14px;">商品总数</p>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="content-card" style="padding: 20px; text-align: center;">
+            <div style="width: 60px; height: 60px; background: #fff3e0; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
+                <i class="bi bi-people" style="font-size: 28px; color: #f57c00;"></i>
+            </div>
+            <h3 style="font-size: 32px; font-weight: 700; color: #333; margin: 0 0 5px;" id="totalMembers">{{ total_members }}</h3>
+            <p style="color: #888; margin: 0; font-size: 14px;">会员数量</p>
+        </div>
+    </div>
+</div>
+
+<!-- 图表区域 -->
+<div class="row g-4 mb-4">
+    <div class="col-md-8">
+        <div class="content-card">
+            <h5 style="color: #333; margin-bottom: 20px; font-weight: 600;">
+                <i class="bi bi-graph-up" style="margin-right: 8px; color: #667eea;"></i>
+                销售趋势
+            </h5>
+            <div id="salesTrendChart" style="height: 300px;"></div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="content-card">
+            <h5 style="color: #333; margin-bottom: 20px; font-weight: 600;">
+                <i class="bi bi-pie-chart" style="margin-right: 8px; color: #667eea;"></i>
+                销售占比
+            </h5>
+            <div id="salesRankChart" style="height: 300px;"></div>
+        </div>
+    </div>
+</div>
+
+<!-- 库存预警和最近订单 -->
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="content-card">
+            <h5 style="color: #333; margin-bottom: 20px; font-weight: 600;">
+                <i class="bi bi-exclamation-triangle" style="margin-right: 8px; color: #e74c3c;"></i>
+                库存预警
+            </h5>
+            <div id="stockWarningList"></div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="content-card">
+            <h5 style="color: #333; margin-bottom: 20px; font-weight: 600;">
+                <i class="bi bi-exclamation-diamond" style="margin-right: 8px; color: #f39c12;"></i>
+                过期提醒
+            </h5>
+            <div id="expiryWarningList"></div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+<script>
+// 显示暂无数据的图表
+function showEmptyChart(chart, title) {
+    var option = {
+        title: {
+            text: title,
+            left: 'center',
+            top: 'center',
+            textStyle: {
+                color: '#999',
+                fontSize: 16,
+                fontWeight: 'normal'
+            }
+        },
+        graphic: {
+            elements: [{
+                type: 'image',
+                style: {
+                    image: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNjY2MiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0zIDN2MThoMTgiLz48cGF0aCBkPSJNMTggMTdWOSIvPjxwYXRoIGQ9Ik0xMyAxN1Y1Ii8+PHBhdGggZD0iTTggMTd2LTMiLz48L3N2Zz4=',
+                    width: 64,
+                    height: 64
+                },
+                left: 'center',
+                top: '20%'
+            }]
+        }
+    };
+    chart.setOption(option);
+}
+
+// 初始化销售趋势图表
+function initSalesTrendChart() {
+    var chart = echarts.init(document.getElementById('salesTrendChart'));
+    
+    // 先清空图表
+    chart.clear();
+    
+    // 通过AJAX获取数据
+    $.ajax({
+        url: '/reports/api/dashboard/sales-trend/',
+        type: 'GET',
+        success: function(response) {
+            if (response.code === '1') {
+                var data = response.data;
+                
+                // 检查是否有数据
+                var hasData = data.sales_data && data.sales_data.some(function(val) { return val > 0; });
+                
+                if (!hasData) {
+                    showEmptyChart(chart, '暂无销售数据');
+                    return;
+                }
+                
+                var option = {
+                    tooltip: {
+                        trigger: 'axis'
+                    },
+                    grid: {
+                        left: '3%',
+                        right: '4%',
+                        bottom: '3%',
+                        containLabel: true
+                    },
+                    xAxis: {
+                        type: 'category',
+                        boundaryGap: false,
+                        data: data.x_axis
+                    },
+                    yAxis: {
+                        type: 'value',
+                        name: '营业额 (元)'
+                    },
+                    series: [{
+                        name: '销售额',
+                        type: 'line',
+                        data: data.sales_data,
+                        smooth: true,
+                        itemStyle: {
+                            color: '#667eea'
+                        },
+                        areaStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                {offset: 0, color: 'rgba(102, 126, 234, 0.3)'},
+                                {offset: 1, color: 'rgba(102, 126, 234, 0.1)'}
+                            ])
+                        }
+                    }]
+                };
+                
+                chart.setOption(option);
+            }
+        },
+        error: function() {
+            console.error('获取销售趋势数据失败');
+        }
+    });
+    
+    window.addEventListener('resize', function() {
+        chart.resize();
+    });
+}
+
+// 初始化销售占比图表
+function initSalesRankChart() {
+    var chart = echarts.init(document.getElementById('salesRankChart'));
+    
+    // 先清空图表
+    chart.clear();
+    
+    // 通过AJAX获取数据
+    $.ajax({
+        url: '/reports/api/dashboard/sales-rank/',
+        type: 'GET',
+        success: function(response) {
+            if (response.code === '1') {
+                var data = response.data;
+                
+                // 检查是否有数据
+                var hasData = data.categories && data.categories.length > 0 && data.quantities && data.quantities.some(function(val) { return val > 0; });
+                
+                if (!hasData) {
+                    showEmptyChart(chart, '暂无销售数据');
+                    return;
+                }
+                
+                var chartData = [];
+                for (let i = 0; i < data.categories.length; i++) {
+                    chartData.push({
+                        value: data.quantities[i],
+                        name: data.categories[i]
+                    });
+                }
+                
+                var option = {
+                    tooltip: {
+                        trigger: 'item',
+                        formatter: '{b}: {c} ({d}%)'
+                    },
+                    legend: {
+                        orient: 'vertical',
+                        left: 'left'
+                    },
+                    series: [{
+                        name: '销量',
+                        type: 'pie',
+                        radius: '70%',
+                        data: chartData,
+                        label: {
+                            show: true,
+                            formatter: '{b}\n{c}'
+                        },
+                        emphasis: {
+                            itemStyle: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        }
+                    }]
+                };
+                
+                chart.setOption(option);
+            }
+        },
+        error: function() {
+            console.error('获取销售占比数据失败');
+        }
+    });
+    
+    window.addEventListener('resize', function() {
+        chart.resize();
+    });
+}
+
+// 加载库存预警数据
+function loadStockWarning() {
+    $.ajax({
+        url: '/reports/api/dashboard/stock-warning/',
+        type: 'GET',
+        success: function(response) {
+            if (response.code === '1') {
+                var products = response.data.products;
+                var html = '';
+                
+                if (products.length === 0) {
+                    html = '<div style="text-align: center; padding: 40px 20px; color: #999;"><i class="bi bi-check-circle" style="font-size: 50px; margin-bottom: 15px; opacity: 0.3; color: #27ae60;"></i><p>暂无库存预警</p><small>所有商品库存充足</small></div>';
+                } else {
+                    html = '<table class="table table-hover"><thead><tr><th>商品名称</th><th>当前库存</th><th>预警库存</th><th>单位</th></tr></thead><tbody>';
+                    for (let i = 0; i < products.length; i++) {
+                        var p = products[i];
+                        html += '<tr><td>' + p.name + '</td><td style="color: #e74c3c; font-weight: bold;">' + p.stock + '</td><td>' + p.warning_stock + '</td><td>' + p.unit + '</td></tr>';
+                    }
+                    html += '</tbody></table>';
+                }
+                
+                $('#stockWarningList').html(html);
+            }
+        },
+        error: function() {
+            console.error('获取库存预警数据失败');
+        }
+    });
+}
+
+// 加载过期提醒数据
+function loadExpiryWarning() {
+    $.ajax({
+        url: '/reports/api/dashboard/expiry-warning/',
+        type: 'GET',
+        success: function(response) {
+            if (response.code === '1') {
+                var products = response.data.products;
+                var html = '';
+                
+                if (products.length === 0) {
+                    html = '<div style="text-align: center; padding: 40px 20px; color: #999;"><i class="bi bi-check-circle" style="font-size: 50px; margin-bottom: 15px; opacity: 0.3; color: #27ae60;"></i><p>暂无过期提醒</p><small>所有商品均在保质期内</small></div>';
+                } else {
+                    html = '<table class="table table-hover"><thead><tr><th>商品名</th><th>过期时间</th><th>剩余库存</th><th>最近入库时间</th></tr></thead><tbody>';
+                    for (let i = 0; i < products.length; i++) {
+                        var p = products[i];
+                        html += '<tr><td>' + p.name + '</td><td style="color: #e74c3c; font-weight: bold;">' + p.expiry_date + '</td><td>' + p.stock + '</td><td>' + p.last_stock_time + '</td></tr>';
+                    }
+                    html += '</tbody></table>';
+                }
+                
+                $('#expiryWarningList').html(html);
+            }
+        },
+        error: function() {
+            console.error('获取过期提醒数据失败');
+        }
+    });
+}
+
+// 加载今日统计数据
+function loadTodayStats() {
+    $.ajax({
+        url: '/reports/api/overview/',
+        type: 'GET',
+        data: { period: 'day' },
+        success: function(response) {
+            if (response.code === '1') {
+                var data = response.data;
+                $('#todaySales').text('¥' + data.sales.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+                $('#todayOrders').text(data.orders.toLocaleString('zh-CN'));
+            }
+        },
+        error: function() {
+            console.error('获取今日统计数据失败');
+        }
+    });
+}
+
+// 刷新所有数据
+function refreshDashboardData() {
+    initSalesTrendChart();
+    initSalesRankChart();
+    loadStockWarning();
+    loadExpiryWarning();
+    loadTodayStats();
+}
+
+// 页面加载完成后初始化
+$(document).ready(function() {
+    refreshDashboardData();
+});
+
+// 监听页面可见性变化，当页面重新可见时刷新数据
+document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) {
+        refreshDashboardData();
+    }
+});
+</script>

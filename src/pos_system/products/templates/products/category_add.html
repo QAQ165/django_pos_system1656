@@ -1,0 +1,231 @@
+{% extends 'public/base.html' %}
+
+{% block title %}新增分类 - 零售店POS系统{% endblock %}
+
+{% block content %}
+<!-- 页面标题 -->
+<div class="page-header">
+    <h1 class="page-title">新增分类</h1>
+    <div class="page-actions">
+        <a href="{% url 'products:product_categories' %}" class="btn-back">
+            <i class="bi bi-arrow-left"></i>
+            返回列表
+        </a>
+    </div>
+</div>
+
+<!-- 内容区域 -->
+<div class="card">
+    <div class="card-body">
+        <form id="categoryForm" class="category-form">
+            <div class="form-group">
+                <label for="name" class="form-label">分类名称 <span class="required">*</span></label>
+                <input type="text" id="name" name="name" class="form-control" placeholder="请输入分类名称" required>
+                <div class="form-text">分类名称不能为空，且不能重复</div>
+            </div>
+
+            <div class="form-group">
+                <label for="parent_id" class="form-label">父级分类</label>
+                <select id="parent_id" name="parent_id" class="form-select">
+                    <option value="">无（顶级分类）</option>
+                    {% for category in all_categories %}
+                        <option value="{{ category.id }}" data-level="{{ category.level }}">
+                            {% if category.level == 1 %}{{ category.name }} (1级){% endif %}
+                            {% if category.level == 2 %}&nbsp;&nbsp;&nbsp;&nbsp;{{ category.name }} (2级){% endif %}
+                            {% if category.level == 3 %}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ category.name }} (3级){% endif %}
+                            {% if category.level == 4 %}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ category.name }} (4级){% endif %}
+                            {% if category.level == 5 %}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ category.name }} (5级){% endif %}
+                        </option>
+                    {% endfor %}
+                </select>
+                <div class="form-text">选择父级分类后，当前分类级别将自动设置为父级+1</div>
+            </div>
+
+            <div class="form-group">
+                <label for="sort_order" class="form-label">排序序号 <span class="required">*</span></label>
+                <input type="number" id="sort_order" name="sort_order" class="form-control" 
+                       placeholder="请输入排序序号" min="0" max="100" value="0" required>
+                <div class="form-text">用于前端分类的展示排序，范围：0-100</div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-submit">
+                    <i class="bi bi-check-circle"></i>
+                    保存
+                </button>
+                <button type="button" class="btn-cancel" onclick="window.location.href='{% url 'products:product_categories' %}'">
+                    <i class="bi bi-x-circle"></i>
+                    取消
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.category-form {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.form-group {
+    margin-bottom: 24px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #333;
+}
+
+.required {
+    color: #dc3545;
+}
+
+.form-control,
+.form-select {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+.form-control:focus,
+.form-select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-text {
+    margin-top: 6px;
+    font-size: 12px;
+    color: #999;
+}
+
+.form-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 32px;
+}
+
+.btn-submit,
+.btn-cancel {
+    padding: 10px 30px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+.btn-submit {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-cancel {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-cancel:hover {
+    background: #5a6268;
+}
+
+.btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.btn-back:hover {
+    background: #5a6268;
+    transform: translateY(-1px);
+}
+</style>
+
+<script>
+$(document).ready(function() {
+    var $form = $('#categoryForm');
+    var $nameInput = $('#name');
+    var $parentSelect = $('#parent_id');
+    var $sortOrderInput = $('#sort_order');
+
+    $form.on('submit', function(e) {
+        e.preventDefault();
+        
+        var name = $nameInput.val().trim();
+        var parentId = $parentSelect.val();
+        var sortOrder = $sortOrderInput.val();
+
+        if (!name) {
+            alert('请输入分类名称');
+            return;
+        }
+
+        if (sortOrder < 0 || sortOrder > 100) {
+            alert('排序序号必须在0-100之间');
+            return;
+        }
+
+        var formData = new FormData();
+        formData.append('name', name);
+        formData.append('parent_id', parentId);
+        formData.append('sort_order', sortOrder);
+
+        $.ajax({
+            url: '{% url "admin_category_add" %}',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            success: function(data) {
+                if (data.success) {
+                    alert(data.message);
+                    window.location.href = '{% url "admin_product_categories" %}';
+                } else {
+                    alert(data.message);
+                }
+            },
+            error: function() {
+                alert('操作失败，请重试');
+            }
+        });
+    });
+
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = $.trim(cookies[i]);
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+});
+</script>
+{% endblock %}

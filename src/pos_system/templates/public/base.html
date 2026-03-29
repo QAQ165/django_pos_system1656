@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}零售店POS系统{% endblock %}</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Element Plus CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/element-plus@2.4.4/dist/index.css" />
+    <!-- jQuery -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+    
+    {% load static %}
+    <style>
+        /* ==================== 全局样式 ==================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            background-color: #f5f6fa;
+            overflow-x: hidden;
+        }
+        
+        /* ==================== 顶部导航栏 ==================== */
+        .top-navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0 20px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+        
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .navbar-brand i {
+            font-size: 1.5rem;
+        }
+        
+        .navbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+        
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        
+        .btn-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255,255,255,0.15);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 18px;
+        }
+        
+        .btn-icon:hover {
+            background: rgba(255,255,255,0.25);
+            transform: scale(1.05);
+        }
+        
+        .btn-logout {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .btn-logout:hover {
+            background: rgba(255,255,255,0.3);
+            color: white;
+            transform: scale(1.05);
+        }
+        
+        /* ==================== 侧边栏 ==================== */
+        .sidebar {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            bottom: 0;
+            width: 240px;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+            transition: width 0.3s ease;
+            overflow-y: auto;
+            z-index: 999;
+        }
+        
+        .sidebar.collapsed {
+            width: 70px;
+        }
+        
+        .sidebar-header {
+            padding: 10px 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .sidebar-header h5 {
+            margin: 0;
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .sidebar.collapsed .sidebar-header h5 {
+            display: none;
+        }
+        
+        .btn-collapse {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background: white;
+            color: #666;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-collapse:hover {
+            background: #f0f0f0;
+            color: #667eea;
+            border-color: #667eea;
+        }
+        
+        .sidebar-menu {
+            padding: 10px 0;
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 14px 20px;
+            color: #666;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+            cursor: pointer;
+        }
+        
+        .menu-item:hover {
+            background: #f8f9fa;
+            color: #667eea;
+        }
+        
+        .menu-item.active {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            color: #667eea;
+            border-left-color: #667eea;
+        }
+        
+        .menu-item i {
+            font-size: 20px;
+            width: 24px;
+            text-align: center;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        
+        .menu-item span {
+            font-size: 14px;
+            white-space: nowrap;
+        }
+        
+        .sidebar.collapsed .menu-item span {
+            display: none;
+        }
+        
+        .sidebar.collapsed .menu-item {
+            justify-content: center;
+            padding: 14px 0;
+        }
+        
+        .sidebar.collapsed .menu-item i {
+            margin-right: 0;
+        }
+        
+        /* ==================== Element Plus 菜单样式覆盖 ==================== */
+        .sidebar-menu {
+            border: none !important;
+        }
+        
+        .sidebar-menu .el-menu-item {
+            height: 50px;
+            line-height: 50px;
+            border-left: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-menu .el-menu-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .sidebar-menu .el-menu-item.is-active {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            color: #667eea;
+            border-left-color: #667eea;
+        }
+        
+        .sidebar-menu .el-icon {
+            font-size: 20px;
+            margin-right: 12px;
+        }
+        
+        .sidebar-menu .el-sub-menu__title {
+            height: 50px;
+            line-height: 50px;
+            border-left: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-menu .el-sub-menu__title:hover {
+            background: #f8f9fa;
+        }
+        
+        .sidebar-menu .el-sub-menu.is-opened > .el-sub-menu__title {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            color: #667eea;
+            border-left-color: #667eea;
+        }
+        
+        .sidebar-menu .el-sub-menu .el-menu-item {
+            height: 45px;
+            line-height: 45px;
+            padding-left: 56px !important;
+        }
+        
+        .sidebar-menu .el-sub-menu .el-menu-item:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+        
+        .sidebar-menu .el-sub-menu .el-menu-item.is-active {
+            background: rgba(102, 126, 234, 0.15);
+            color: #667eea;
+        }
+        
+        /* 折叠状态下的菜单样式 */
+        .sidebar.collapsed .sidebar-menu .el-menu-item span,
+        .sidebar.collapsed .sidebar-menu .el-sub-menu__title span {
+            display: none;
+        }
+        
+        .sidebar.collapsed .sidebar-menu .el-menu-item,
+        .sidebar.collapsed .sidebar-menu .el-sub-menu__title {
+            justify-content: center;
+            padding-left: 0 !important;
+        }
+        
+        .sidebar.collapsed .sidebar-menu .el-icon {
+            margin-right: 0;
+        }
+        
+        /* ==================== 主内容区 ==================== */
+        .main-content {
+            margin-left: 240px;
+            margin-top: 60px;
+            padding: 25px;
+            min-height: calc(100vh - 60px);
+            transition: margin-left 0.3s ease;
+            position: relative;
+        }
+        
+        .sidebar.collapsed + .main-content {
+            margin-left: 70px;
+        }
+        
+        /* ==================== 公共样式 ==================== */
+       /* 页面标题和操作按钮 */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        /* 内容卡片 */
+        .content-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        
+        /* Toast提示 */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 2000;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .toast.success {
+            background: #4caf50;
+        }
+        
+        .toast.error {
+            background: #f44336;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        /* 加载遮罩 */
+        #loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* ==================== 响应式适配 ==================== */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+            }
+            
+            .sidebar .sidebar-header h5,
+            .sidebar .menu-item span {
+                display: none;
+            }
+            
+            .sidebar .menu-item {
+                justify-content: center;
+                padding: 14px 0;
+            }
+            
+            .sidebar .menu-item i {
+                margin-right: 0;
+            }
+            
+            .main-content {
+                margin-left: 70px;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .page-actions {
+                width: 100%;
+            }
+            
+            .page-actions .btn {
+                flex: 1;
+                justify-content: center;
+            }
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <nav class="top-navbar">
+        <a class="navbar-brand" href="{% url 'reports:dashboard' %}">
+            <i class="bi bi-shop"></i>
+            <span>零售店POS系统</span>
+        </a>
+        
+        <div class="navbar-actions">
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="bi bi-person"></i>
+                </div>
+                <span>{{ user.username }}</span>
+                {% if user.role == 'admin' %}
+                    <span class="badge bg-light text-dark ms-1">管理员</span>
+                {% elif user.role == 'manager' %}
+                    <span class="badge bg-light text-dark ms-1">店长</span>
+                {% endif %}
+            </div>
+            
+            {% if user.role == 'admin' %}
+            <button class="btn-icon" title="系统设置" onclick="window.location.href='{% url 'system:settings' %}';">
+                <i class="bi bi-gear"></i>
+            </button>
+            {% endif %}
+            
+            <a href="{% url 'logout' %}" class="btn-logout" title="退出登录">
+                <i class="bi bi-box-arrow-right"></i>
+                <span>退出</span>
+            </a>
+        </div>
+    </nav>
+    
+    <!-- 左侧侧边栏 -->
+    <aside class="sidebar" id="sidebar">
+        <div id="sidebarApp">
+            <div class="sidebar-header">
+                <button class="btn-collapse" @click="toggleCollapse" title="折叠/展开">
+                    <i class="bi bi-chevron-left" id="collapseIcon"></i>
+                </button>
+            </div>
+            <el-menu
+                :default-active="activeMenu"
+                class="sidebar-menu"
+                background-color="#ffffff"
+                text-color="#666666"
+                active-text-color="#667eea"
+                @select="handleSelect">
+                
+                <el-menu-item index="/reports/dashboard/">
+                    <el-icon><i class="bi bi-speedometer2"></i></el-icon>
+                    <span>仪表盘</span>
+                </el-menu-item>
+                
+                <el-menu-item index="/sales/orders/">
+                    <el-icon><i class="bi bi-receipt"></i></el-icon>
+                    <span>订单管理</span>
+                </el-menu-item>
+                
+                <el-sub-menu index="products">
+                    <template #title>
+                        <el-icon><i class="bi bi-box-seam"></i></el-icon>
+                        <span>商品管理</span>
+                    </template>
+                    <el-menu-item index="/products/categories/">
+                        <el-icon><i class="bi bi-tags"></i></el-icon>
+                        <span>商品分类</span>
+                    </el-menu-item>
+                    <el-menu-item index="/products/list/">
+                        <el-icon><i class="bi bi-list"></i></el-icon>
+                        <span>商品列表</span>
+                    </el-menu-item>
+                </el-sub-menu>
+                
+                <el-menu-item index="/products/stock/">
+                    <el-icon><i class="bi bi-boxes"></i></el-icon>
+                    <span>库存管理</span>
+                </el-menu-item>
+                
+                <el-menu-item index="/members/list/">
+                    <el-icon><i class="bi bi-people"></i></el-icon>
+                    <span>会员管理</span>
+                </el-menu-item>
+                
+                <el-menu-item index="/reports/reports/">
+                    <el-icon><i class="bi bi-graph-up"></i></el-icon>
+                    <span>数据统计</span>
+                </el-menu-item>
+
+                {% if user.role == 'admin' %}
+                <el-menu-item index="/users/users/">
+                    <el-icon><i class="bi bi-person-badge"></i></el-icon>
+                    <span>员工管理</span>
+                </el-menu-item>
+                {% endif %}
+                
+                {% if user.role == 'admin' %}
+                <el-menu-item index="/system/settings/">
+                    <el-icon><i class="bi bi-gear"></i></el-icon>
+                    <span>系统设置</span>
+                </el-menu-item>
+                {% endif %}
+            </el-menu>
+            </div>
+    </aside>
+    
+    <!-- 右侧主内容区 -->
+    <main class="main-content">
+        <div id="loading-overlay" style="display: none;">
+            <div class="loading-spinner"></div>
+        </div>
+        <div id="page-content">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- 打印样式 -->
+    <style>
+        @media print {
+            /* 隐藏顶部导航栏 */
+            .top-navbar {
+                display: none !important;
+            }
+            
+            /* 隐藏左侧菜单栏 */
+            #sidebar {
+                display: none !important;
+            }
+            
+            /* 隐藏页面路径 */
+            .breadcrumb {
+                display: none !important;
+            }
+            
+            /* 隐藏页面操作按钮 */
+            .page-actions {
+                display: none !important;
+            }
+            
+            /* 调整主内容区域 */
+            .main-content {
+                margin: 0 !important;
+                padding: 20px !important;
+                width: 100% !important;
+            }
+            
+            /* 优化打印布局 */
+            body {
+                background: white !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            
+            /* 隐藏滚动条 */
+            body::-webkit-scrollbar {
+                display: none;
+            }
+            
+            /* 优化图表打印 */
+            .content-card {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+            
+            /* 隐藏不必要的元素 */
+            .btn-outline-custom, .btn-primary-custom {
+                display: none !important;
+            }
+        }
+    </style>
+
+    <!-- Vue 3 -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@3.3.4/dist/vue.global.min.js"></script>
+    <!-- Element Plus -->
+    <script src="https://cdn.jsdelivr.net/npm/element-plus@2.4.4/dist/index.full.min.js"></script>
+    
+    <script>
+        const { createApp, ref } = Vue;
+        const { ElMessage } = ElementPlus;
+   
+
+        // 创建全局响应式状态并挂载到 window
+        window.globalState = {
+            activeMenu: ref(window.location.pathname),
+            setActiveMenu(path) {
+                this.activeMenu.value = path;
+            }
+        };
+        //加载当前页面的样式
+        // loadPageSpecificCSS(window.globalState.activeMenu.value);
+        
+        // 根据当前路径计算激活的菜单项
+        function getActiveMenuFromPath(path) {
+            // 如果是商品管理子菜单项，返回对应的路径
+            if (path.startsWith('/products/categories') || path.startsWith('/products/list')) {
+                return path;
+            }
+            return path;
+        }
+        
+        // 初始化激活菜单
+        window.globalState.setActiveMenu(getActiveMenuFromPath(window.location.pathname));
+
+        const sidebarApp = createApp({
+            setup() {
+                const isCollapsed = ref(false);
+                
+                const handleSelect = (index) => {
+                    // loadPageSpecificCSS(index);
+                    loadPage(index);
+                };
+                
+                const toggleCollapse = () => {
+                    isCollapsed.value = !isCollapsed.value;
+                    const sidebar = document.getElementById('sidebar');
+                    const collapseIcon = document.getElementById('collapseIcon');
+                    
+                    if (isCollapsed.value) {
+                        sidebar.classList.add('collapsed');
+                        collapseIcon.classList.remove('bi-chevron-left');
+                        collapseIcon.classList.add('bi-chevron-right');
+                    } else {
+                        sidebar.classList.remove('collapsed');
+                        collapseIcon.classList.remove('bi-chevron-right');
+                        collapseIcon.classList.add('bi-chevron-left');
+                    }
+                };
+                
+                return {
+                    isCollapsed,
+                    activeMenu: window.globalState.activeMenu,
+                    handleSelect,
+                    toggleCollapse
+                };
+            }
+        });
+        
+     
+        function loadPageSpecificCSS(path) {
+          
+    //     //自定义css路径
+    //    var diy_css=['/system/settings/'];
+    //    var diy_url=['/system/settings/'];
+    //         forEach(diy_css, (item,index) => {
+    //             if (path==item) {
+    //                 path=diy_url[index];
+    //                 return;
+    //             }
+    //         });
+
+            if (!path||path=='') return;
+            var cssFile =  path.slice(0, -1);
+            var head = document.head;
+            console.log('cssFile',cssFile);
+
+                // 检查 CSS 是否已加载
+                var isLoaded = false;
+                var links = head.getElementsByTagName('link');
+                for (var i = 0; i < links.length; i++) {
+                    if (links[i].getAttribute('href') === cssFile) {
+                        isLoaded = true;
+                        break;
+                    }
+                }
+
+                // 如果未加载，则动态创建 link 标签
+                if (!isLoaded) {
+                    var link = document.createElement('link');
+                    link.rel = 'stylesheet';
+                    link.href = "/static/css/"+cssFile+".css";
+                    head.appendChild(link);
+                    console.log('link',link);
+                }
+          
+        }
+
+
+
+        sidebarApp.use(ElementPlus);
+        sidebarApp.mount('#sidebarApp');
+    </script>
+    
+    <script>
+        // 用于存储从后端返回的菜单状态
+        window.pendingMenuUpdate = null;
+        
+        function loadPage(url) {
+            var $pageContent = $('#page-content');
+            var $loadingOverlay = $('#loading-overlay');
+            
+            $loadingOverlay.show();
+            
+            $.ajax({
+                url: url,
+                type: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                success: function(data) {
+                    $pageContent.html(data);
+
+                   // 如果页面内容中设置了 pendingMenuUpdate，则使用它更新菜单
+                    
+                    if (window.pendingMenuUpdate) {
+                          var urlPath = window.pendingMenuUpdate.split('?')[0];
+                       
+                        window.globalState.setActiveMenu(urlPath);
+        
+                        window.pendingMenuUpdate = null;
+                    } else {
+                        // 否则使用 URL 更新菜单（去除查询参数）
+                        var urlPath = url.split('?')[0];
+                       
+                        window.globalState.setActiveMenu(urlPath);
+                    }
+          
+                    window.history.pushState({ url: url }, '', url);
+                },
+                error: function(xhr) {
+                    if (xhr.status === 401) {
+                        window.location.href = '/login/';
+                    } else {
+                        $pageContent.html('<div class="alert alert-danger">加载失败，请重试</div>');
+                    }
+                },
+                complete: function() {
+                    $loadingOverlay.hide();
+                }
+            });
+        }
+    
+        $(document).ready(function() {
+    
+            
+            window.addEventListener('popstate', function(event) {
+                if (event.state && event.state.url) {
+                    loadPage(event.state.url);
+                }
+            });
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

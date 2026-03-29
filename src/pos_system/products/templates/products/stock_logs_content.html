@@ -1,0 +1,446 @@
+
+<style>
+.filter-section {
+    background: #f0f7ff;
+    padding: 16px 20px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    border: 1px solid #d6e8ff;
+}
+
+.filter-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.filter-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filter-item label {
+    font-weight: 500;
+    color: #4a6fa5;
+    white-space: nowrap;
+    font-size: 14px;
+}
+
+.filter-item .form-select,
+.filter-item .form-control {
+    min-width: 140px;
+    padding: 6px 12px;
+    border: 1px solid #b8d4f0;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.filter-item .form-select:focus,
+.filter-item .form-control:focus {
+    border-color: #4a90e2;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.15);
+}
+
+.btn-primary,
+.btn-secondary {
+    padding: 6px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 14px;
+}
+
+.btn-primary {
+    background: #4a90e2;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #357abd;
+}
+
+.btn-secondary {
+    background: #e8f1f8;
+    color: #4a6fa5;
+    border: 1px solid #b8d4f0;
+}
+
+.btn-secondary:hover {
+    background: #d6e8ff;
+}
+
+.table {
+    margin-bottom: 0;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.table th {
+    background: #e8f4fc;
+    color: #2c5aa0;
+    font-weight: 600;
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 2px solid #b8d4f0;
+    font-size: 14px;
+}
+
+.table td {
+    vertical-align: middle;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e8f1f8;
+    font-size: 14px;
+    color: #333;
+}
+
+.table tbody tr:hover {
+    background: #f5faff;
+}
+
+.table tbody tr:nth-child(even) {
+    background: #fafcfe;
+}
+
+.table tbody tr:nth-child(even):hover {
+    background: #f0f7ff;
+}
+
+.badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #e8f1f8;
+}
+
+.pagination {
+    margin: 0;
+}
+
+.page-item .page-link {
+    color: #4a90e2;
+    border: 1px solid #d6e8ff;
+    padding: 6px 12px;
+}
+
+.page-item.active .page-link {
+    background: #4a90e2;
+    border-color: #4a90e2;
+    color: white;
+}
+
+.page-item.disabled .page-link {
+    color: #b8d4f0;
+    border-color: #e8f1f8;
+}
+
+.page-info {
+    color: #6b8cae;
+    font-size: 13px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #8fa8c8;
+}
+
+.empty-state i {
+    font-size: 48px;
+    margin-bottom: 16px;
+    display: block;
+    color: #b8d4f0;
+}
+
+.empty-state h3 {
+    font-size: 16px;
+    margin-bottom: 8px;
+    color: #6b8cae;
+    font-weight: 500;
+}
+
+.empty-state p {
+    font-size: 13px;
+    color: #9ab;
+}
+
+.text-muted {
+    color: #9ab;
+}
+</style>
+
+<!-- 页面标题 -->
+<div class="page-header">
+    <h1 class="page-title">库存日志</h1>
+</div>
+
+<!-- 内容区域 -->
+<div class="card">
+    <div class="card-body">
+        <!-- 筛选和搜索区域 -->
+        <div class="filter-section">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label>变动类型：</label>
+                    <select id="changeTypeFilter" class="form-select">
+                        <option value="">全部</option>
+                        <option value="increase" {% if change_type_filter == 'increase' %}selected{% endif %}>增加</option>
+                        <option value="decrease" {% if change_type_filter == 'decrease' %}selected{% endif %}>减少</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>操作人：</label>
+                    <input type="text" id="operatorSearch" class="form-control" placeholder="输入操作人名称" value="{{ operator_search }}">
+                </div>
+                <div class="filter-item">
+                    <label>商品：</label>
+                    <input type="text" id="productSearch" class="form-control" placeholder="商品名称或ID" value="{{ product_search }}">
+                </div>
+                <div class="filter-item">
+                    <label>订单ID：</label>
+                    <input type="text" id="orderId" class="form-control" placeholder="输入订单ID" value="{{ order_id }}">
+                </div>
+                <div class="filter-item">
+                    <label>变动时间：</label>
+                    <div class="date-range" style="display: flex; align-items: center; gap: 8px;">
+                        <input type="date" id="startDate" class="form-control" value="{{ start_date }}">
+                        <span>至</span>
+                        <input type="date" id="endDate" class="form-control" value="{{ end_date }}">
+                    </div>
+                </div>
+                <div class="filter-item">
+                    <button id="searchBtn" class="btn-primary">
+                        <i class="bi bi-search"></i>
+                        搜索
+                    </button>
+                    <button id="resetBtn" class="btn-secondary">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                        重置
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 数据表格 -->
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th style="width: 80px;">ID</th>
+                        <th style="width: 150px;">操作人</th>
+                        <th style="width: 200px;">商品名称</th>
+                        <th style="width: 100px;">变动数量</th>
+                        <th style="width: 100px;">订单ID</th>
+                        <th style="width: 100px;">变动类型</th>
+                        <th style="width: 100px;">变动前库存</th>
+                        <th style="width: 100px;">变动后库存</th>
+                        <th style="width: 180px;">变动时间</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs %}
+                    <tr>
+                        <td>{{ log.id }}</td>
+                        <td>
+                            <span class="operator-info">
+                                {{ log.operator.username }} (ID: {{ log.operator.id }})
+                            </span>
+                        </td>
+                        <td>
+                            <span class="product-info">
+                                {{ log.product.name }} (ID: {{ log.product.id }})
+                            </span>
+                        </td>
+                        <td>
+                            {% if log.change_type == 'sale' or log.change_type == 'adjust' %}
+                            <span style="color: #dc3545;">-{{ log.quantity }}</span>
+                            {% else %}
+                            <span style="color: #28a745;">+{{ log.quantity }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if log.order %}
+                            {{ log.order.id }}
+                            {% else %}
+                            <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge" style="background-color: {% if log.change_type == 'sale' %}#dc3545{% elif log.change_type == 'purchase' %}#28a745{% elif log.change_type == 'return' %}#ffc107{% else %}#17a2b8{% endif %}; color: white;">
+                                {{ log.get_change_type_display }}
+                            </span>
+                        </td>
+                        <td>{{ log.before_stock }}</td>
+                        <td>{{ log.after_stock }}</td>
+                        <td>{{ log.create_time|date:"Y-m-d H:i:s" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" class="text-center">
+                            <div class="empty-state">
+                                <i class="bi bi-inbox"></i>
+                                <h3>暂无库存日志数据</h3>
+                                <p>库存变动记录将显示在这里</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 分页 -->
+        {% if logs.has_other_pages %}
+        <div class="pagination-container">
+            <nav>
+                <ul class="pagination">
+                    {% if logs.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="javascript:void(0)" onclick="goToPage(1)">首页</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="javascript:void(0)" onclick="goToPage({{ logs.previous_page_number }})">上一页</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">首页</span>
+                        </li>
+                        <li class="page-item disabled">
+                            <span class="page-link">上一页</span>
+                        </li>
+                    {% endif %}
+
+                    {% for num in logs.paginator.page_range %}
+                        {% if logs.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                        {% elif num > logs.number|add:'-3' and num < logs.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="javascript:void(0)" onclick="goToPage({{ num }})">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if logs.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="javascript:void(0)" onclick="goToPage({{ logs.next_page_number }})">下一页</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="javascript:void(0)" onclick="goToPage({{ logs.paginator.num_pages }})">末页</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">下一页</span>
+                        </li>
+                        <li class="page-item disabled">
+                            <span class="page-link">末页</span>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            <div class="page-info">
+                第 {{ logs.number }} 页 / 共 {{ logs.paginator.num_pages }} 页
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    var $changeTypeFilter = $('#changeTypeFilter');
+    var $operatorSearch = $('#operatorSearch');
+    var $productSearch = $('#productSearch');
+    var $orderId = $('#orderId');
+    var $startDate = $('#startDate');
+    var $endDate = $('#endDate');
+    var $searchBtn = $('#searchBtn');
+    var $resetBtn = $('#resetBtn');
+
+    $searchBtn.on('click', function() {
+        var changeType = $changeTypeFilter.val();
+        var operator = $operatorSearch.val().trim();
+        var product = $productSearch.val().trim();
+        var orderId = $orderId.val().trim();
+        var startDate = $startDate.val();
+        var endDate = $endDate.val();
+        
+        var params = [];
+        if (changeType) params.push('change_type=' + changeType);
+        if (operator) params.push('operator=' + encodeURIComponent(operator));
+        if (product) params.push('product=' + encodeURIComponent(product));
+        if (orderId) params.push('order_id=' + encodeURIComponent(orderId));
+        if (startDate) params.push('start_date=' + startDate);
+        if (endDate) params.push('end_date=' + endDate);
+        params.push('page=1');
+        
+        loadPage('{% url "products:stock" %}?' + params.join('&'));
+    });
+
+    $resetBtn.on('click', function() {
+        $changeTypeFilter.val('');
+        $operatorSearch.val('');
+        $productSearch.val('');
+        $orderId.val('');
+        $startDate.val('');
+        $endDate.val('');
+        loadPage('{% url "products:stock" %}');
+    });
+
+    $operatorSearch.on('keypress', function(e) {
+        if (e.which === 13) {
+            $searchBtn.trigger('click');
+        }
+    });
+
+    $productSearch.on('keypress', function(e) {
+        if (e.which === 13) {
+            $searchBtn.trigger('click');
+        }
+    });
+
+    $orderId.on('keypress', function(e) {
+        if (e.which === 13) {
+            $searchBtn.trigger('click');
+        }
+    });
+});
+
+// 分页跳转函数
+function goToPage(pageNum) {
+    var changeType = $('#changeTypeFilter').val();
+    var operator = $('#operatorSearch').val().trim();
+    var product = $('#productSearch').val().trim();
+    var orderId = $('#orderId').val().trim();
+    var startDate = $('#startDate').val();
+    var endDate = $('#endDate').val();
+    
+    var params = ['page=' + pageNum];
+    if (changeType) params.push('change_type=' + changeType);
+    if (operator) params.push('operator=' + encodeURIComponent(operator));
+    if (product) params.push('product=' + encodeURIComponent(product));
+    if (orderId) params.push('order_id=' + encodeURIComponent(orderId));
+    if (startDate) params.push('start_date=' + startDate);
+    if (endDate) params.push('end_date=' + endDate);
+    
+    loadPage('{% url "products:stock" %}?' + params.join('&'));
+}
+
+// 更新菜单激活状态
+{% if active_menu %}
+window.pendingMenuUpdate = '{{ active_menu }}';
+{% endif %}
+</script>
